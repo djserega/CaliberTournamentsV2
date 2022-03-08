@@ -1,0 +1,56 @@
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CaliberTournamentsV2.Models.PickBans
+{
+    internal abstract class PickBan
+    {
+        internal PickBan(PickBanKind kind)
+        {
+            Kind = kind;
+        }
+
+        internal bool IsActive { get => DateStart != default && DateEnd == default; }
+        [JsonProperty]
+        internal bool IsEnded { get => DateEnd != default; }
+        [JsonProperty]
+        internal DateTime DateStart { get; set; }
+        [JsonProperty]
+        internal DateTime DateEnd { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        internal PickBanKind Kind { get; set; }
+        [JsonProperty]
+        internal List<PickBanDetailed> PickBanDetailed { get; set; } = new List<PickBanDetailed>();
+        internal List<PickBanDetailedId> DetailedIds { get; set; } = new List<PickBanDetailedId>();
+
+        internal void AddDetailedId(string label, string id)
+        {
+            DetailedIds.Add(new(label, id));
+        }
+
+        internal void AddDetails(Teams.Team? command, PickBanType type, string name = "")
+        {
+            PickBanDetailed.Add(new PickBanDetailed()
+            {
+                Id = PickBanDetailed.Count,
+                Team = command,
+                PickBanType = type,
+                PickBanName = name
+            });
+        }
+
+        internal PickBanDetailedId? GetButtonByLabel(string? label)
+        {
+            if (DetailedIds.Any(el => el.Name == label))
+                return DetailedIds.First(el => el.Name == label);
+
+            return default;
+        }
+    }
+}

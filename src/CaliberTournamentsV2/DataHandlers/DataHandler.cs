@@ -1,0 +1,126 @@
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CaliberTournamentsV2.DataHandlers
+{
+    internal class DataHandler
+    {
+        private static string[] _allMaps = Array.Empty<string>();
+        private static readonly GoogleApis.Spreadsheets _spreadsheetsSaver;
+
+        static DataHandler()
+        {
+            _spreadsheetsSaver = new GoogleApis.Spreadsheets();
+        }
+
+        internal DataHandler(IConfigurationRoot? config)
+        {
+            try
+            {
+                _allMaps = config?.GetSection("maps").GetStrings() ?? throw new NullReferenceException("Не найден ключ списка карт");
+
+                if (_allMaps.Length == 0)
+                    Worker.LogWarn("Не найдена (не заполнена) группа списка доступных карт");
+                else
+                {
+                    Array addedMapsToEnums = Enum.GetValues(typeof(Models.MapsTournamentHacking));
+
+                    List<string> enumMapsleft = new();
+                    for (int i = 0; i < addedMapsToEnums.Length; i++)
+                        enumMapsleft.Add(addedMapsToEnums.GetValue(i)!.ToString() ?? string.Empty);
+
+                    List<string> mapsLeft = new(_allMaps);
+
+                    foreach (string selectedMap in _allMaps)
+                    {
+                        if (enumMapsleft.Contains(selectedMap))
+                        {
+                            enumMapsleft.Remove(selectedMap);
+
+                            if (mapsLeft.Contains(selectedMap))
+                                mapsLeft.Remove(selectedMap);
+                        }
+                    }
+
+                    if (mapsLeft.Count > 0)
+                    {
+                        StringBuilder stringBuilderErrorMessage = new("Ошибка в определении списка доступных карт:\n");
+                        stringBuilderErrorMessage.Append("Осталось карт с ошибками: ");
+                        stringBuilderErrorMessage.AppendLine(string.Join(", ", mapsLeft));
+
+                        stringBuilderErrorMessage.Append("Осталось доступных карт: ");
+                        stringBuilderErrorMessage.AppendLine(string.Join(", ", enumMapsleft));
+
+                        throw new Exception(stringBuilderErrorMessage.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InitException("Не удалось загрузить параметры обработки данных", ex);
+            }
+        }
+
+        internal static string[] GetAllMaps() => _allMaps;
+
+        internal async static void ReceivedPickBanMessagesEvent(DiscordChannel channel,
+                                                                DiscordMessage message,
+                                                                ulong userId,
+                                                                string buttonId)
+        {
+            bool processed= false;
+
+            SendPickBans.SendPickBanMap mapsHandler = new(_allMaps, channel, message);
+            if (mapsHandler.ContainsButton(userId,
+                                           buttonId,
+                                           out Models.Referee.StartPickBan? startPickBanMaps))
+            {
+                if (startPickBanMaps != null)
+                    mapsHandler.SendPickBanMessage(startPickBanMaps);
+                
+                processed = true;
+
+            }
+
+            if (!processed)
+            {
+                SendPickBans.SendPickBanOperators operatorsHandler = new(channel);
+                if (operatorsHandler.ContainsButton(userId,
+                                                    buttonId,
+                                                    out Models.Referee.StartPickBan? startPickBanOperators,
+                                                    out Models.PickBans.PickBanDetailed? detailedMap))
+                {
+                    if (startPickBanOperators != null
+                        && detailedMap != null)
+                    {
+                        operatorsHandler.SendPickBanMessage(startPickBanOperators,
+                                                            detailedMap);
+
+                        await Task.Run(() =>
+                        {
+                            UnloadData();
+                        });
+                    }
+                }
+            }
+        }
+
+        private static async void UnloadData()
+        {
+            try
+            {
+                await _spreadsheetsSaver.SaveDataListPickBans(Models.Referee.StartPickBan.ListPickBans);
+            }
+            catch (Exception ex)
+            {
+                Worker.LogErr(ex.ToString());
+            }
+        }
+
+    }
+}
