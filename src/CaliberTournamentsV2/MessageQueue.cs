@@ -53,6 +53,14 @@ namespace CaliberTournamentsV2
         internal bool RemoveMessage { get; }
         internal Action<ulong>? ResultActionMessage { get; }
 
+        internal static void Add(DiscordChannel chat, string message, ulong? idUpdate = null, bool removeMessage = false)
+        {
+            MessageQueue messageQueue = new(chat.Id, message, idUpdate, removeMessage);
+            _messages.Enqueue(messageQueue);
+
+            if (!_timerSender.Enabled)
+                _timerSender.Start();
+        }
         internal static void Add(ulong chatId, string message, ulong? idUpdate = null, bool removeMessage = false)
         {
             MessageQueue messageQueue = new(chatId, message, idUpdate, removeMessage);
