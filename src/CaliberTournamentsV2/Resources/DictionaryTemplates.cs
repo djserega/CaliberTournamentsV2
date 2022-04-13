@@ -26,6 +26,9 @@ namespace CaliberTournamentsV2.Resources
         internal static string GetOperators(string key)
                => GetDictValue(_dictNameOperators!, key);
 
+        internal static string GetKeyMap(string value)
+            => GetDictKey(_dictNameMap!, value);
+
         private static string GetDictValue(Dictionary<string, string> dict, string key)
         {
             string name = NameElemetnByDefault;
@@ -33,12 +36,29 @@ namespace CaliberTournamentsV2.Resources
             if (string.IsNullOrEmpty(key))
                 key = "<не найдено>";
 
-#if DEBUG
-            name += " (" + key + ")";
-#endif
-
             if (dict.ContainsKey(key))
                 name = dict[key];
+
+#if DEBUG
+            //name += " (" + key + ")";
+#endif
+
+            return name;
+        }
+
+        private static string GetDictKey(Dictionary<string, string> dict, string value)
+        {
+            string name = NameElemetnByDefault;
+
+            if (string.IsNullOrEmpty(value))
+                name = "<не найдено>";
+
+            if (dict.ContainsValue(value))
+                name = dict.First(el => el.Value == value).Key;
+
+#if DEBUG
+            //name += " (" + value + ")";
+#endif
 
             return name;
         }
@@ -58,10 +78,10 @@ namespace CaliberTournamentsV2.Resources
             return values;
         }
 
-        private static void FillDictNameMap() 
+        private static void FillDictNameMap()
             => _dictNameMap = DeserializeJsonString(GetJsonTextResource("NameMaps.json"))
                 ?? throw new NullReferenceException("Не удалось прочитать NameMaps.json");
-        private static void FillDictNameOperators() 
+        private static void FillDictNameOperators()
             => _dictNameOperators = DeserializeJsonString(GetJsonTextResource("NameOperators.json"))
                 ?? throw new NullReferenceException("Не удалось прочитать NameOperators.json");
 
