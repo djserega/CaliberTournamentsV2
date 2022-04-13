@@ -43,12 +43,18 @@ namespace CaliberTournamentsV2.Commands
         [Command("StartPickBanMap")]
         [Aliases("map")]
 #pragma warning disable CA1822 // its ok
-        internal async Task StartPickBanMap(CommandContext ctx, string teamName1, string teamName2, string mode)
+        internal async Task StartPickBanMap(CommandContext ctx, string teamName1, string teamName2, string mode = "")
         {
             try
             {
                 if (!Access.IsReferee(ctx.User, "StartPickBanMap"))
                     return;
+
+                if (string.IsNullOrWhiteSpace(mode))
+                {
+                    MessageQueue.Add(ctx.Channel, "Не указан режим bo1, bo3, bo5.", removeMessage: true);
+                    return;
+                }
 
                 if (!await CheckRegisteredTeams(ctx, teamName1, teamName2))
                     return;
