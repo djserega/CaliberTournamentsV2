@@ -156,10 +156,11 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
                 if (itemPickBan.PickBanType == Models.PickBanType.pick)
                     builderRestMap.AppendLine($"{i++}: {itemPickBan.PickBanName}   {itemPickBan.Team?.Name}");
 
-                mapsLeft.Remove(itemPickBan.PickBanName ?? string.Empty);
+                if (!string.IsNullOrWhiteSpace(itemPickBan.PickBanName))
+                    mapsLeft.Remove(Resources.DictionaryTemplates.GetKeyMap(itemPickBan.PickBanName));
             }
 
-            string lastMap = mapsLeft[0];
+            string lastMap = Resources.DictionaryTemplates.GetMap(mapsLeft[0]);
 
             builderRestMap.AppendLine($"{i}. {lastMap}");
 
