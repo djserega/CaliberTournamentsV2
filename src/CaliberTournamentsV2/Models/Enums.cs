@@ -22,4 +22,9 @@ namespace CaliberTournamentsV2.Models
         { РекрутМедик, Дед, Травник, Бард, Каравай, Микола, Шатц, Монк, Ватсон, Велюр, Шаршерет, Мигель, Багги, Каваль }
     public enum OperatorsMarksman
         { РекрутСнайпер, Стрелок, Сокол, Комар, Тень, Стилет, Курт, Скаут, Арчер, Вагабонд, Эйма, Диабло, Султан, Бусел }
+
+    public enum StatisticTypes
+        { operators, maps }
+    public enum StatisticDetailedTypes
+        { none, picked, banned }
 }
