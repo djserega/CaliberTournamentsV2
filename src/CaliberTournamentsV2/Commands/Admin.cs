@@ -92,6 +92,31 @@ namespace CaliberTournamentsV2.Commands
             }
         }
 
+        [Command("GetInfo")]
+        internal async Task GetInfo(CommandContext ctx, string user)
+        {
+            try
+            {
+                ulong userId = user.GetID();
+
+                DiscordUser dataUser = await Bot.DiscordBot.GetDiscordUserById(userId);
+
+                StringBuilder sb = new();
+                sb.Append(dataUser.Username);
+                sb.Append("#");
+                sb.AppendLine(dataUser.Discriminator);
+                sb.Append("Id: ");
+                sb.AppendLine(dataUser.Id.ToString());
+                sb.AppendLine("Avatar: ");
+                sb.AppendLine(dataUser.AvatarUrl);
+
+            }
+            catch (Exception ex)
+            {
+                Worker.LogErr(ex.ToString());
+            }
+        }
+
         private static string AddTeam(string teamName, string capitan)
         {
             string message = string.Empty;
