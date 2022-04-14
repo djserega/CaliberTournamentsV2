@@ -123,6 +123,51 @@ namespace CaliberTournamentsV2.Commands
             }
         }
 
+        [Command("Stats")]
+        internal async Task GetStatistics(CommandContext ctx, string type = "", string details = "")
+        {
+            try
+            {
+                if (!Access.IsAdmin(ctx.User, "GetStatistics"))
+                    return;
+
+                string message = "";
+                bool isError = true;
+
+                if (string.IsNullOrWhiteSpace(type))
+                {
+                    StringBuilder sb = new("Доступные значения:");
+                    sb.AppendLine("operators (<none>, picked, banned)");
+                    sb.AppendLine("maps (<none>, picked, banned)");
+
+                    message = sb.ToString();
+                }
+                else if (type != "operators" && type != "maps")
+                {
+                    message = "Ошибка доступных значений";
+                }
+                else
+                {
+                    Models.StatisticTypes enumType = (Models.StatisticTypes)Enum.Parse(typeof(Models.StatisticTypes), type);
+                    Models.StatisticDetailedTypes enumDetails = string.IsNullOrWhiteSpace(details)
+                        ? Models.StatisticDetailedTypes.none
+                        : (Models.StatisticDetailedTypes)Enum.Parse(typeof(Models.StatisticDetailedTypes), details);
+
+                    message = new Statistics().GetStatistics(enumType, enumDetails);
+                    isError = false;
+                }
+
+                if (isError)
+                    MessageQueue.Add(ctx.Channel, message, removeMessage: true);
+                else
+                    await ctx.Channel.SendMessageAsync(message);
+            }
+            catch (Exception ex)
+            {
+                Worker.LogErr(ex.ToString());
+            }
+        }
+
         private static string AddTeam(string teamName, string capitan)
         {
             string message = string.Empty;
