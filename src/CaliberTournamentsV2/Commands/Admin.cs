@@ -78,6 +78,9 @@ namespace CaliberTournamentsV2.Commands
         {
             try
             {
+                if (!Access.IsAdmin(ctx.User, "RegisterReferee"))
+                    return;
+
                 ulong refereeID = referee.GetID();
 
                 Access.RegisterReferee(refereeID);
@@ -97,6 +100,9 @@ namespace CaliberTournamentsV2.Commands
         {
             try
             {
+                if (!Access.IsAdmin(ctx.User, "GetInfo"))
+                    return;
+
                 ulong userId = user.GetID();
 
                 DiscordUser dataUser = await Bot.DiscordBot.GetDiscordUserById(userId);
