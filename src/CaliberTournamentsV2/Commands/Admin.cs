@@ -137,8 +137,8 @@ namespace CaliberTournamentsV2.Commands
                 if (string.IsNullOrWhiteSpace(type))
                 {
                     StringBuilder sb = new("Доступные значения:");
-                    sb.AppendLine("operators (<none>, picked, banned)");
-                    sb.AppendLine("maps (<none>, picked, banned)");
+                    sb.AppendLine("operators (all, picked, banned)");
+                    sb.AppendLine("maps (\"\", picked, banned)");
 
                     message = sb.ToString();
                 }
