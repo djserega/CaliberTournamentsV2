@@ -24,7 +24,7 @@ namespace CaliberTournamentsV2.Models
         { РекрутСнайпер, Стрелок, Сокол, Комар, Тень, Стилет, Курт, Скаут, Арчер, Вагабонд, Эйма, Диабло, Султан, Бусел }
 
     public enum StatisticTypes
-        { operators, maps }
+        { all, operators, maps }
     public enum StatisticDetailedTypes
         { none, picked, banned }
 }
