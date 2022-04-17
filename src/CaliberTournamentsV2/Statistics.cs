@@ -12,11 +12,14 @@ namespace CaliberTournamentsV2
 
         internal string GetStatistics(Models.StatisticTypes type, Models.StatisticDetailedTypes details)
         {
+#pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
             string message = type switch
             {
                 Models.StatisticTypes.operators => GetStatOperators(details),
-                Models.StatisticTypes.maps => ""
+                Models.StatisticTypes.maps => GetStatMaps(details),
+                Models.StatisticTypes.all => throw new NotImplementedException()
             };
+#pragma warning restore CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
 
             return message;
         }
@@ -25,12 +28,38 @@ namespace CaliberTournamentsV2
         {
             List<Models.Referee.StartPickBan> listData = Models.Referee.StartPickBan.ListPickBans;
 
-            IEnumerable<Models.PickBans.PickBanDetailed> filterData = listData
+            IEnumerable<Models.PickBans.PickBanDetailed> listDetailedOperators = listData
                 .Select(el => el.PickBanMap)
                 .SelectMany(el => el.PickBanDetailed
                     .Select(el2 => el2.Operators))
+                .SelectMany(el => el.PickBanDetailed);
+
+            return GetStringStatistics(listDetailedOperators, details, "Оперативники:");
+        }
+
+        private string GetStatMaps(Models.StatisticDetailedTypes details)
+        {
+            List<Models.Referee.StartPickBan> listData = Models.Referee.StartPickBan.ListPickBans;
+
+            IEnumerable<Models.PickBans.PickBanDetailed> listDetailsMaps = listData
+                .Select(el => el.PickBanMap)
                 .SelectMany(el => el.PickBanDetailed)
-                .Where(el => el.PickBanType == Models.PickBanType.pick && el.Cheched);
+                    .Where(el => el.Cheched);
+
+            return GetStringStatistics(listDetailsMaps, details, "Карты:");
+        }
+
+        private string GetStringStatistics(IEnumerable<Models.PickBans.PickBanDetailed> listSelectedData, Models.StatisticDetailedTypes details, string header)
+        {
+
+#pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
+            IEnumerable<Models.PickBans.PickBanDetailed> filterData = details switch
+            {
+                Models.StatisticDetailedTypes.picked => listSelectedData.Where(el => el.PickBanType == Models.PickBanType.pick && el.Cheched),
+                Models.StatisticDetailedTypes.banned => listSelectedData.Where(el => el.PickBanType == Models.PickBanType.ban && el.Cheched),
+                Models.StatisticDetailedTypes.none => listSelectedData.Where(el => el.Cheched),
+            };
+#pragma warning restore CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
 
             foreach (Models.PickBans.PickBanDetailed item in filterData)
                 UpdateDictionary(item.PickBanName ?? string.Empty);
@@ -38,7 +67,7 @@ namespace CaliberTournamentsV2
             var sortedData = _dict.OrderByDescending(el => el.Value);
 
             StringBuilder builderResult = new();
-            builderResult.AppendLine("Оперативники:");
+            builderResult.AppendLine(header);
             foreach (var item in sortedData)
                 builderResult.AppendLine($"{item.Key} - {item.Value}");
 
