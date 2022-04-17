@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DSharpPlus.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,12 +9,10 @@ namespace CaliberTournamentsV2
 {
     internal class Statistics
     {
-        private Dictionary<string, int> _dict = new();
-
-        internal string GetStatistics(Models.StatisticTypes type, Models.StatisticDetailedTypes details)
+        internal DiscordEmbed GetStatistics(Models.StatisticTypes type, Models.StatisticDetailedTypes details)
         {
 #pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
-            string message = type switch
+            DiscordEmbed embedMessage = type switch
             {
                 Models.StatisticTypes.operators => GetStatOperators(details),
                 Models.StatisticTypes.maps => GetStatMaps(details),
@@ -21,10 +20,10 @@ namespace CaliberTournamentsV2
             };
 #pragma warning restore CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
 
-            return message;
+            return embedMessage;
         }
 
-        private string GetStatOperators(Models.StatisticDetailedTypes details)
+        private DiscordEmbed GetStatOperators(Models.StatisticDetailedTypes details)
         {
             List<Models.Referee.StartPickBan> listData = Models.Referee.StartPickBan.ListPickBans;
 
@@ -34,10 +33,10 @@ namespace CaliberTournamentsV2
                     .Select(el2 => el2.Operators))
                 .SelectMany(el => el.PickBanDetailed);
 
-            return GetStringStatistics(listDetailedOperators, details, "Оперативники:");
+            return GetEmbedStatistics(listDetailedOperators, details, Models.StatisticTypes.operators);
         }
 
-        private string GetStatMaps(Models.StatisticDetailedTypes details)
+        private DiscordEmbed GetStatMaps(Models.StatisticDetailedTypes details)
         {
             List<Models.Referee.StartPickBan> listData = Models.Referee.StartPickBan.ListPickBans;
 
@@ -46,10 +45,10 @@ namespace CaliberTournamentsV2
                 .SelectMany(el => el.PickBanDetailed)
                     .Where(el => el.Cheched);
 
-            return GetStringStatistics(listDetailsMaps, details, "Карты:");
+            return GetEmbedStatistics(listDetailsMaps, details, Models.StatisticTypes.maps);
         }
 
-        private string GetStringStatistics(IEnumerable<Models.PickBans.PickBanDetailed> listSelectedData, Models.StatisticDetailedTypes details, string header)
+        private DiscordEmbed GetEmbedStatistics(IEnumerable<Models.PickBans.PickBanDetailed> listSelectedData, Models.StatisticDetailedTypes details, Models.StatisticTypes type)
         {
 
 #pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
@@ -61,25 +60,58 @@ namespace CaliberTournamentsV2
             };
 #pragma warning restore CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
 
-            foreach (Models.PickBans.PickBanDetailed item in filterData)
-                UpdateDictionary(item.PickBanName ?? string.Empty);
+            Dictionary<string, int> dictPicked = new();
+            Dictionary<string, int> dictBanned = new();
 
-            var sortedData = _dict.OrderByDescending(el => el.Value);
+            foreach (Models.PickBans.PickBanDetailed item in filterData)
+            {
+                if (item.PickBanType == Models.PickBanType.pick)
+                    UpdateDictionary(dictPicked, item.PickBanName ?? string.Empty);
+                else if (item.PickBanType == Models.PickBanType.ban)
+                    UpdateDictionary(dictBanned, item.PickBanName ?? string.Empty);
+            }
+
+            Builders.Embeds embedsMessage = new Builders.Embeds()
+                .Init()
+                .AddTitle("Сводная информация");
 
             StringBuilder builderResult = new();
-            builderResult.AppendLine(header);
-            foreach (var item in sortedData)
-                builderResult.AppendLine($"{item.Key} - {item.Value}");
 
-            return builderResult.ToString();
+            if (details == Models.StatisticDetailedTypes.picked
+                || details == Models.StatisticDetailedTypes.none)
+            {
+                IOrderedEnumerable<KeyValuePair<string, int>> sortedDataPicked = dictPicked.OrderByDescending(el => el.Value);
+
+                foreach (KeyValuePair<string, int> item in sortedDataPicked)
+                    builderResult.AppendLine($"{item.Key} - {item.Value}");
+
+                embedsMessage.AddField("Picked", builderResult.ToString(), true);
+                
+                builderResult.Clear();
+            }
+
+            if (details == Models.StatisticDetailedTypes.banned
+                || details == Models.StatisticDetailedTypes.none)
+            {
+                IOrderedEnumerable<KeyValuePair<string, int>> sortedDataBanned = dictBanned.OrderByDescending(el => el.Value);
+
+                foreach (KeyValuePair<string, int> item in sortedDataBanned)
+                    builderResult.AppendLine($"{item.Key} - {item.Value}");
+
+                embedsMessage.AddField("Banned", builderResult.ToString(), true);
+
+                builderResult.Clear();
+            }
+
+            return embedsMessage.GetEmbed();
         }
 
-        private void UpdateDictionary(string key)
+        private static void UpdateDictionary(Dictionary<string, int> dict, string key)
         {
-            if (_dict.ContainsKey(key))
-                _dict[key]++;
+            if (dict.ContainsKey(key))
+                dict[key]++;
             else
-                _dict.Add(key, 1);
+                dict.Add(key, 1);
         }
     }
 }

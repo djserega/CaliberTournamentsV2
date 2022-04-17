@@ -153,14 +153,15 @@ namespace CaliberTournamentsV2.Commands
                         ? Models.StatisticDetailedTypes.none
                         : (Models.StatisticDetailedTypes)Enum.Parse(typeof(Models.StatisticDetailedTypes), details);
 
-                    message = new Statistics().GetStatistics(enumType, enumDetails);
+                    DiscordEmbed embedMessage = new Statistics().GetStatistics(enumType, enumDetails);
+                    
+                    await ctx.Channel.SendMessageAsync(embedMessage);
+                    
                     isError = false;
                 }
 
                 if (isError)
                     MessageQueue.Add(ctx.Channel, message, removeMessage: true);
-                else
-                    await ctx.Channel.SendMessageAsync(message);
             }
             catch (Exception ex)
             {
