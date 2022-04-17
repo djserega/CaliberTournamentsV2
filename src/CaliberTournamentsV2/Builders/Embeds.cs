@@ -33,6 +33,12 @@ namespace CaliberTournamentsV2.Builders
         internal string Title { set { if (_embedBuilder == null) Init(); _embedBuilder!.Title = value; } }
         internal string Description { set { if (_embedBuilder == null) Init(); _embedBuilder!.Description = value; } }
 
+        internal Embeds AddTitle(string title)
+        {
+            Title = title;
+            return this;
+        }
+
         internal Embeds AddDescription(string description)
         {
             Description = description;
