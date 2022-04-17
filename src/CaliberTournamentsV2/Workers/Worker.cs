@@ -57,7 +57,7 @@ namespace CaliberTournamentsV2
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger?.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(60 * 1000, stoppingToken);
+                await Task.Delay(600 * 1000, stoppingToken);
             }
         }
     }
