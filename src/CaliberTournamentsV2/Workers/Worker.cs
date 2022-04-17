@@ -15,39 +15,39 @@ namespace CaliberTournamentsV2
             try
             {
 
-                LogInf("Запуск системы...");
+                LogInf("System startup...");
 
                 _logger = logger;
 
 
-                LogInf("Подключение событий...");
+                LogInf("Connection events...");
 
                 InitWorkerEvents();
 
 
-                LogInf("Базовая инициализация...");
+                LogInf("Base initialization...");
 
                 InitWorkerMain();
 
 
-                LogInf("Подготовка обработчика данных...");
+                LogInf("Initialization data processor...");
 
                 _dataHandler = new(_config);
 
 
-                LogInf("Настройка доступов...");
+                LogInf("Settings access...");
 
                 _access = new(_config);
 
 
-                LogInf("Запуск discord-бота...");
+                LogInf("Startup discordbot...");
 
                 _discordBot = new(_config);
 
             }
             catch (Exception ex)
             {
-                LogErr("!!! Критическая ошибка запуска приложения !!!");
+                LogErr("!!! Critical error at system startup !!!");
                 LogErr(ex.ToString());
             }
         }
