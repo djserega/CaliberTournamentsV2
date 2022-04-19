@@ -30,9 +30,9 @@ namespace CaliberTournamentsV2
                     .Init()
                     .AddDescription("Карты");
 
-                embedsLogMaps.AddField("Период", $"{LogsMaps.DateStart.GetFormattedTime()}-{LogsMaps.DateEnd.GetFormattedTime()}");
-                embedsLogMaps.AddField("Пик", LogsMaps.GetFormatterDetailed(Models.PickBanType.pick));
-                embedsLogMaps.AddField("Бан", LogsMaps.GetFormatterDetailed(Models.PickBanType.ban));
+                embedsLogMaps.AddField("Период", $"{LogsMaps.DateStart.GetFormattedTime()}-{LogsMaps.DateEnd.GetFormattedTime()}", true);
+                embedsLogMaps.AddField("Пик", LogsMaps.GetFormatterDetailed(Models.PickBanType.pick), true);
+                embedsLogMaps.AddField("Бан", LogsMaps.GetFormatterDetailed(Models.PickBanType.ban), true);
 
                 _logBuilder.AddEmbed(embedsLogMaps.GetEmbed());
 
@@ -46,9 +46,9 @@ namespace CaliberTournamentsV2
                             .Init()
                             .AddDescription($"Карта {Formatter.Bold(itemMap.PickBanName)}");
 
-                        embedsLogOperators.AddField("Период", $"{itemMap.Operators.DateStart.GetFormattedTime()}-{itemMap.Operators.DateEnd.GetFormattedTime()}");
-                        embedsLogOperators.AddField("Пик", itemMap.Operators.GetFormatterDetailed(Models.PickBanType.pick));
-                        embedsLogOperators.AddField("Бан", itemMap.Operators.GetFormatterDetailed(Models.PickBanType.ban));
+                        embedsLogOperators.AddField("Период", $"{itemMap.Operators.DateStart.GetFormattedTime()}-{itemMap.Operators.DateEnd.GetFormattedTime()}", true);
+                        embedsLogOperators.AddField("Пик", itemMap.Operators.GetFormatterDetailed(Models.PickBanType.pick), true);
+                        embedsLogOperators.AddField("Бан", itemMap.Operators.GetFormatterDetailed(Models.PickBanType.ban), true);
 
                         _logBuilder.AddEmbed(embedsLogOperators.GetEmbed());
                     }
