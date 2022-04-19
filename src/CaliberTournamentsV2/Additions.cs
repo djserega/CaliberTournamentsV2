@@ -85,9 +85,9 @@ namespace CaliberTournamentsV2
             return builderCache.ToString();
         }
     
-        public static string GetFormattedTime(this DateTime source)
+        public static string GetFormattedTime(this DateTime source, string format = "HH:mm:ss")
         {
-            return source.ToString("HH:mm:ss");
+            return source.ToString(format);
         }
     }
 }
