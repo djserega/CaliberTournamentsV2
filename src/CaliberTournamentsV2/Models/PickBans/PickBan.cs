@@ -52,5 +52,27 @@ namespace CaliberTournamentsV2.Models.PickBans
 
             return default;
         }
+    
+        internal string GetFormatterDetailed(PickBanType? type = null)
+        {
+            StringBuilder result = new();
+
+            foreach (PickBanDetailed item in PickBanDetailed)
+            {
+                if (type == null)
+                    AppendDetailedToResult(result, item);
+                else if (item.PickBanType == type)
+                    AppendDetailedToResult(result, item);
+            }
+
+            return result.ToString();
+        }
+
+        private static void AppendDetailedToResult(StringBuilder builder, PickBanDetailed detailed)
+        {
+            builder.Append(detailed?.Team?.Name);
+            builder.Append(" - ");
+            builder.AppendLine(detailed?.PickBanName);
+        }
     }
 }
