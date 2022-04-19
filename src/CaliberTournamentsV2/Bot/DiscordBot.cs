@@ -110,6 +110,18 @@ namespace CaliberTournamentsV2.Bot
             return discordMessage;
         }
 
+        internal static async Task<ulong> SendMessage(ulong idChannel, string text)
+        {
+            if (_discord == null)
+                return default;
+
+            DiscordChannel channel = await _discord.GetChannelAsync(idChannel);
+
+            DiscordMessage message = await _discord.SendMessageAsync(channel, text);
+
+            return message.Id;
+        }
+
         internal static async Task<DiscordUser> GetDiscordUserById(ulong id)
         {
             return await _discord!.GetUserAsync(id);
