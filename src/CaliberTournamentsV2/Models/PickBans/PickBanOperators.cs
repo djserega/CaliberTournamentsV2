@@ -10,6 +10,8 @@ namespace CaliberTournamentsV2.Models.PickBans
 {
     internal class PickBanOperators : PickBan
     {
+        internal bool ResultGenerated { get; set; }
+
         internal PickBanOperators() : base(PickBanKind.operators)
         {
             TeamOperators = new();

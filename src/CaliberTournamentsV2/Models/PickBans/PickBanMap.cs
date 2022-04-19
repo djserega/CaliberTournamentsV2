@@ -11,5 +11,7 @@ namespace CaliberTournamentsV2.Models.PickBans
         internal PickBanMap() : base(PickBanKind.map)
         {
         }
+
+        internal bool ResultGenerated { get; set; }
     }
 }

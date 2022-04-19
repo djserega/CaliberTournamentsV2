@@ -17,12 +17,13 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
             _channel = channel;
         }
 
-
         public bool ContainsButton(ulong userId,
                                    string buttonId,
+                                   out Models.Referee.StartPickBan? startPickBan,
                                    out Models.Referee.StartPickBan? startPickBanOut,
                                    out Models.PickBans.PickBanDetailed? PickBanDetailedOut)
         {
+            startPickBan = default;
             startPickBanOut = default;
             PickBanDetailedOut = default;
 
@@ -32,7 +33,7 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
 
             if (Models.Referee.StartPickBan.ListPickBans.Any(predicateFindVotingOperatiors))
             {
-                Models.Referee.StartPickBan startPickBan = Models.Referee.StartPickBan.ListPickBans.First(predicateFindVotingOperatiors);
+                startPickBan = Models.Referee.StartPickBan.ListPickBans.First(predicateFindVotingOperatiors);
 
                 Models.PickBans.PickBanDetailed detailedMap = startPickBan.PickBanMap.PickBanDetailed.First(el => el.Operators.DetailedIds.Any(el2 => el2.Id == buttonId));
 
@@ -118,7 +119,10 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
                 await buttonOperators.SendButtonByKeyClassOperators("Снайпер");
 
                 if (currentPickBanType == default || currentTeam == default)
+                {
                     builderButton = CreateResultVoting(data, detailedMap.PickBanName ?? string.Empty, operators);
+                    operators.ResultGenerated = true;
+                }
                 else
                     builderButton = CreateMessageVoting(detailedMap, currentTeam, linkCapitan, currentPickBanType);
 

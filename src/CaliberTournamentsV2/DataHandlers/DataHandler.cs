@@ -12,6 +12,7 @@ namespace CaliberTournamentsV2.DataHandlers
     {
         private static string[] _allMaps = Array.Empty<string>();
         private static readonly GoogleApis.Spreadsheets _spreadsheetsSaver;
+        private static ulong _idChannelLogs;
 
         static DataHandler()
         {
@@ -59,6 +60,8 @@ namespace CaliberTournamentsV2.DataHandlers
                         throw new Exception(stringBuilderErrorMessage.ToString());
                     }
                 }
+
+                _idChannelLogs = config?.GetValue<ulong>("id_channel_log") ?? default;
             }
             catch (Exception ex)
             {
@@ -73,27 +76,33 @@ namespace CaliberTournamentsV2.DataHandlers
                                                                 ulong userId,
                                                                 string buttonId)
         {
-            bool processed= false;
+            bool processedMap = false;
+            bool processedOperators = false;
+
+            Models.Referee.StartPickBan? pickBanMaps = default;
+            Models.PickBans.PickBanDetailed? detailedMap = default;
 
             SendPickBans.SendPickBanMap mapsHandler = new(_allMaps, channel, message);
             if (mapsHandler.ContainsButton(userId,
                                            buttonId,
-                                           out Models.Referee.StartPickBan? startPickBanMaps))
+                                           out pickBanMaps))
             {
-                if (startPickBanMaps != null)
-                    mapsHandler.SendPickBanMessage(startPickBanMaps);
-                
-                processed = true;
+                if (pickBanMaps != null)
+                    mapsHandler.SendPickBanMessage(pickBanMaps);
 
+                processedMap = true;
             }
 
-            if (!processed)
+            if (!processedMap)
             {
-                SendPickBans.SendPickBanOperators operatorsHandler = new(channel);
+                Models.Referee.StartPickBan? pickBanMapForOperators = default;
+
+                SendPickBans.SendPickBanOperators? operatorsHandler = new(channel);
                 if (operatorsHandler.ContainsButton(userId,
                                                     buttonId,
+                                                    out pickBanMapForOperators,
                                                     out Models.Referee.StartPickBan? startPickBanOperators,
-                                                    out Models.PickBans.PickBanDetailed? detailedMap))
+                                                    out detailedMap))
                 {
                     if (startPickBanOperators != null
                         && detailedMap != null)
@@ -101,12 +110,37 @@ namespace CaliberTournamentsV2.DataHandlers
                         operatorsHandler.SendPickBanMessage(startPickBanOperators,
                                                             detailedMap);
 
-                        await Task.Run(() =>
-                        {
-                            UnloadData();
-                        });
+                        processedOperators = true;
+
+                        if (pickBanMaps == default)
+                            pickBanMaps = pickBanMapForOperators;
                     }
                 }
+            }
+
+            if (processedMap || processedOperators)
+            {
+                if (processedMap && (pickBanMaps?.PickBanMap.ResultGenerated ?? false)
+                    || (detailedMap?.Operators?.ResultGenerated ?? false)
+                    )
+                {
+                    Logger logger = new(pickBanMaps?.PickBanMap);
+
+                    logger.CreateBuilderLogs($"{Formatter.Bold(pickBanMaps?.Team1Name)} - {Formatter.Bold(pickBanMaps?.Team2Name)}");
+
+                    if (pickBanMaps != null)
+                    {
+                        if (pickBanMaps.IdMessageLog == default)
+                            pickBanMaps.IdMessageLog = await Bot.DiscordBot.SendMessage(_idChannelLogs, "...");
+
+                        logger.SendMessage(_idChannelLogs, pickBanMaps.IdMessageLog);
+                    }
+                }
+
+                await Task.Run(() =>
+                {
+                    UnloadData();
+                });
             }
         }
 

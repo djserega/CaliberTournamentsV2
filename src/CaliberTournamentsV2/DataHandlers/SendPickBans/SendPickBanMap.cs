@@ -94,7 +94,10 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
             Builders.MessageBuilder builderButton;
 
             if (currentPickBanType == default || currentTeam == default)
+            {
                 builderButton = CreateResultVoting(data);
+                data.PickBanMap.ResultGenerated = true;
+            }
             else
                 builderButton = CreateMessageVoting(data, currentTeam, linkCapitan, currentPickBanType);
 

@@ -12,7 +12,7 @@ namespace CaliberTournamentsV2.Builders
         private const int _maxRowId = 5;
 
         internal string? Description { get; set; }
-        internal DiscordEmbed? Embed { get; set; }
+        internal List<DiscordEmbed> Embeds { get; set; } = new();
 
         internal List<ButtonModel> Buttons { get; set; } = new List<ButtonModel>();
 
@@ -65,7 +65,7 @@ namespace CaliberTournamentsV2.Builders
 
         internal MessageBuilder AddEmbed(DiscordEmbed embed)
         {
-            Embed = embed;
+            Embeds.Add(embed);
             return this;
         }
 
@@ -99,8 +99,9 @@ namespace CaliberTournamentsV2.Builders
             DiscordMessageBuilder builder = new DiscordMessageBuilder()
                 .AddComponents(components);
 
-            if (Embed != null)
-                builder.WithEmbed(Embed);
+            if (Embeds.Count > 0)
+                foreach (DiscordEmbed embed in Embeds)
+                    builder.AddEmbed(embed);
 
             if (!string.IsNullOrEmpty(Description))
                 builder.WithContent(Description);
@@ -113,7 +114,7 @@ namespace CaliberTournamentsV2.Builders
             StringBuilder builderCache = new();
 
             builderCache.Append(Description ?? string.Empty);
-            builderCache.Append(Embed == null ? string.Empty : Embed.GetCache());
+            //builderCache.Append(Embeds == null ? string.Empty : Embeds.GetCache());
             builderCache.Append(string.Join(" ", Buttons.Select(el => el.GetCache())));
 
             return builderCache.ToString();

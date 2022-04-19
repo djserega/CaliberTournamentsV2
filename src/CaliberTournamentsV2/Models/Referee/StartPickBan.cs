@@ -64,6 +64,8 @@ namespace CaliberTournamentsV2.Models.Referee
         [JsonProperty]
         internal PickBans.PickBanMap PickBanMap { get; set; } = new();
 
+        internal ulong IdMessageLog { get; set; } = default;
+
         #endregion
 
         internal static void AddPickBan(StartPickBan newPickBan)
