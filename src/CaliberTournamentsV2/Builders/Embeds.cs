@@ -13,7 +13,7 @@ namespace CaliberTournamentsV2.Builders
 
         internal int CountFields { get; private set; }
 
-        internal Embeds Init(bool addAuthor = true)
+        internal Embeds Init(string author = "Caliber")
         {
             _embedBuilder = new DiscordEmbedBuilder
             {
@@ -21,8 +21,8 @@ namespace CaliberTournamentsV2.Builders
                 Color = new DiscordColor("#b81831")
             };
 
-            if (addAuthor)
-                _embedBuilder.Author = new DiscordEmbedBuilder.EmbedAuthor() { Name = "Caliber" };
+            if (!string.IsNullOrWhiteSpace(author))
+                _embedBuilder.Author = new DiscordEmbedBuilder.EmbedAuthor() { Name = author };
 
             Title = string.Empty;
             Description = string.Empty;

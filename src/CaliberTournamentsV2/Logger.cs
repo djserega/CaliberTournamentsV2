@@ -18,17 +18,17 @@ namespace CaliberTournamentsV2
 
         Models.PickBans.PickBanMap? LogsMaps { get; } = default;
 
-        internal void CreateBuilderLogs(string description)
+        internal void CreateBuilderLogs(string description, string author)
         {
-            _logBuilder = new Builders.MessageBuilder()
-                .AddDescription($"Голосование команд: {description}");
+            _logBuilder = new Builders.MessageBuilder();
+                //.AddDescription(description);
 
 
             if (LogsMaps != default)
             {
                 Builders.Embeds embedsLogMaps = new Builders.Embeds()
-                    .Init()
-                    .AddDescription("Карты");
+                    .Init(author)
+                    .AddDescription(description);
 
                 embedsLogMaps.AddField("Период", $"{LogsMaps.DateStart.GetFormattedTime()}-{LogsMaps.DateEnd.GetFormattedTime()}", true);
                 embedsLogMaps.AddField("Пик", LogsMaps.GetFormatterDetailed(Models.PickBanType.pick), true);
@@ -43,8 +43,8 @@ namespace CaliberTournamentsV2
                     {
 
                         Builders.Embeds embedsLogOperators = new Builders.Embeds()
-                            .Init()
-                            .AddDescription($"Карта {Formatter.Bold(itemMap.PickBanName)}");
+                            .Init($"{author}. Карта {Formatter.Bold(itemMap.PickBanName)}")
+                            .AddDescription(description);
 
                         embedsLogOperators.AddField("Период", $"{itemMap.Operators.DateStart.GetFormattedTime()}-{itemMap.Operators.DateEnd.GetFormattedTime()}", true);
                         embedsLogOperators.AddField("Пик", itemMap.Operators.GetFormatterDetailed(Models.PickBanType.pick), true);

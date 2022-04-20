@@ -66,46 +66,53 @@ namespace CaliberTournamentsV2.Bot
 
             DiscordMessage? discordMessage = default;
 
-            if (message.Embed != null)
+            try
             {
-                if (message.MessageIdUpdate == null)
-                    discordMessage = await _discord.SendMessageAsync(channel, message.Embed);
-                else
+                if (message.Embed != null)
                 {
-                    discordMessage = await channel.GetMessageAsync((ulong)message.MessageIdUpdate);
-                    await discordMessage.ModifyAsync(message.Embed);
+                    if (message.MessageIdUpdate == null)
+                        discordMessage = await _discord.SendMessageAsync(channel, message.Embed);
+                    else
+                    {
+                        discordMessage = await channel.GetMessageAsync((ulong)message.MessageIdUpdate);
+                        await discordMessage.ModifyAsync(message.Embed);
+                    }
                 }
+                else if (message.Message != null)
+                {
+                    if (message.MessageIdUpdate == null)
+                        discordMessage = await _discord.SendMessageAsync(channel, message.Message);
+                    else
+                    {
+                        discordMessage = await channel.GetMessageAsync((ulong)message.MessageIdUpdate);
+                        await discordMessage.ModifyAsync(message.Message);
+                    }
+                }
+                else if (message.MessageBuilder != null)
+                {
+                    if (message.MessageIdUpdate == null)
+                    {
+                        discordMessage = await _discord.SendMessageAsync(channel, message.MessageBuilder);
+
+                        if (message.ResultActionMessage != null)
+                            message.ResultActionMessage.Invoke(discordMessage.Id);
+                    }
+                    else
+                    {
+                        discordMessage = await channel.GetMessageAsync((ulong)message.MessageIdUpdate);
+                        await discordMessage.ModifyAsync(message.MessageBuilder);
+                    }
+                }
+
+                Worker.LogInf($"Sended message from queur in channel: {channel.Name} ({channel.Id}) :: message ({discordMessage?.Id}) {discordMessage?.Content}");
+
+                if (message.RemoveMessage)
+                    discordMessage?.Delete();
             }
-            else if (message.Message != null)
+            catch (Exception ex)
             {
-                if (message.MessageIdUpdate == null)
-                    discordMessage = await _discord.SendMessageAsync(channel, message.Message);
-                else
-                {
-                    discordMessage = await channel.GetMessageAsync((ulong)message.MessageIdUpdate);
-                    await discordMessage.ModifyAsync(message.Message);
-                }
+                Worker.LogErr("Message not sended from queue\n" + ex);
             }
-            else if (message.MessageBuilder != null)
-            {
-                if (message.MessageIdUpdate == null)
-                {
-                    discordMessage = await _discord.SendMessageAsync(channel, message.MessageBuilder);
-
-                    if (message.ResultActionMessage != null)
-                        message.ResultActionMessage.Invoke(discordMessage.Id);
-                }
-                else
-                {
-                    discordMessage = await channel.GetMessageAsync((ulong)message.MessageIdUpdate);
-                    await discordMessage.ModifyAsync(message.MessageBuilder);
-                }
-            }
-
-            Worker.LogInf($"Отправлено сообщение из очереди в канал: {channel.Name} :: {channel.Id} :: {discordMessage?.Id} :: {discordMessage?.Content}");
-
-            if (message.RemoveMessage)
-                discordMessage?.Delete();
 
             return discordMessage;
         }

@@ -126,7 +126,8 @@ namespace CaliberTournamentsV2.DataHandlers
                 {
                     Logger logger = new(pickBanMaps?.PickBanMap);
 
-                    logger.CreateBuilderLogs($"{Formatter.Bold(pickBanMaps?.Team1Name)} - {Formatter.Bold(pickBanMaps?.Team2Name)}");
+                    logger.CreateBuilderLogs(pickBanMaps?.NameReferee ?? string.Empty,
+                                             $"{pickBanMaps?.Team1Name} - {pickBanMaps?.Team2Name}");
 
                     if (pickBanMaps != null)
                     {
