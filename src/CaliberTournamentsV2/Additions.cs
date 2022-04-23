@@ -14,6 +14,13 @@ namespace CaliberTournamentsV2
             return ulong.Parse(new string(source.Where(char.IsDigit).ToArray()));
         }
 
+        public static bool IsIDUser(this string source)
+        {
+            return source.StartsWith("<@")
+                && source.EndsWith(">")
+                && ulong.TryParse(source[2..^1], out _);
+        }
+
         public static string[] Copy(this string[] source)
         {
             string[] sourceCopy = new string[source.Length];
