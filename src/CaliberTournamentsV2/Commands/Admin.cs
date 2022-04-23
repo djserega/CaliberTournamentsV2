@@ -72,7 +72,7 @@ namespace CaliberTournamentsV2.Commands
 
         [Command("GetRegisteredTeams")]
         [Aliases("gregteams")]
-        internal async Task GetRegisteredTeams(CommandContext ctx)
+        internal async Task GetRegisteredTeams(CommandContext ctx, string userOrTeam = "")
         {
             try
             {
@@ -88,8 +88,29 @@ namespace CaliberTournamentsV2.Commands
                 int countTeamInField = 0;
                 int totalCountTeams = 0;
 
+                bool findUser = false;
+                Models.Teams.Player capitan = default;
+                bool findTeam = false;
+
+                if (!string.IsNullOrWhiteSpace(userOrTeam))
+                {
+                    if (userOrTeam.IsIDUser())
+                    {
+                        capitan = new(userOrTeam.GetID());
+                        findUser = true;
+                    }
+                    else
+                        findTeam = true;
+                }
+
                 foreach (Models.Teams.Team itemTeam in Models.Teams.Team.Teams)
                 {
+                    if (findUser && (!itemTeam.Capitan?.UserId.Equals(capitan?.UserId) ?? false))
+                        continue;
+                    if (findTeam && !itemTeam.Name.Contains(userOrTeam, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+
                     if (totalCountTeams % 10 == 0)
                     {
                         embedsRegTeams.AddField(
@@ -208,9 +229,9 @@ namespace CaliberTournamentsV2.Commands
                         : (Models.StatisticDetailedTypes)Enum.Parse(typeof(Models.StatisticDetailedTypes), details);
 
                     DiscordEmbed embedMessage = new Statistics().GetStatistics(enumType, enumDetails);
-                    
+
                     await ctx.Channel.SendMessageAsync(embedMessage);
-                    
+
                     isError = false;
                 }
 
