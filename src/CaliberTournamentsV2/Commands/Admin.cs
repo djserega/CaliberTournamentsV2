@@ -70,6 +70,60 @@ namespace CaliberTournamentsV2.Commands
             }
         }
 
+        [Command("GetRegisteredTeams")]
+        [Aliases("gregteams")]
+        internal async Task GetRegisteredTeams(CommandContext ctx)
+        {
+            try
+            {
+                if (!Access.IsAdmin(ctx.User, "GetRegisteredTeams"))
+                    return;
+
+                Builders.Embeds embedsRegTeams = new Builders.Embeds()
+                    .Init()
+                    .AddDescription("Зарегистрированные команды");
+
+                StringBuilder builerFileds = new();
+
+                int countTeamInField = 0;
+                int totalCountTeams = 0;
+
+                foreach (Models.Teams.Team itemTeam in Models.Teams.Team.Teams)
+                {
+                    if (totalCountTeams % 10 == 0)
+                    {
+                        embedsRegTeams.AddField(
+                            $"{totalCountTeams - countTeamInField + 1}/{totalCountTeams}",
+                            builerFileds.ToString(), true);
+                        builerFileds.Clear();
+
+                        countTeamInField = 0;
+                    }
+
+                    builerFileds.Append(itemTeam.Name);
+                    builerFileds.Append(" - ");
+                    builerFileds.AppendLine(itemTeam.Capitan?.Name);
+
+                    countTeamInField++;
+                    totalCountTeams++;
+                }
+
+                if (builerFileds.Length != 0)
+                {
+                    embedsRegTeams.AddField(
+                        $"{totalCountTeams - countTeamInField + 1}/{totalCountTeams}",
+                        builerFileds.ToString(), true);
+                    builerFileds.Clear();
+                }
+
+                await ctx.Channel.SendMessageAsync(embedsRegTeams.GetEmbed());
+            }
+            catch (Exception ex)
+            {
+                Worker.LogErr($"GetRegisteredTeams. {ex}");
+            }
+        }
+
         [Command("RegisterReferee")]
         [Aliases("regreferee")]
 #pragma warning disable CA1822 // its ok
