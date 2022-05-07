@@ -273,7 +273,7 @@ namespace CaliberTournamentsV2.Commands
                 {
                     Models.Teams.Team.AddTeam(newTeam);
 
-                    message = $"Добавлена команда {teamName}. Capitan {newTeam.Capitan?.Name}#{newTeam.Capitan?.Discriminator}";
+                    message = $"Добавлена команда {Formatter.Bold(teamName)}. Капитан: {Formatter.Bold(newTeam.Capitan?.Name)}#{Formatter.Bold(newTeam.Capitan?.Discriminator)}";
                 }
 
                 Worker.LogInf(message);
