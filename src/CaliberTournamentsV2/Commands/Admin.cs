@@ -1,4 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
@@ -12,7 +13,7 @@ namespace CaliberTournamentsV2.Commands
     internal class Admin : BaseCommand, ICommands
     {
         [Command("RegisterTeam")]
-        [Aliases("regteam")]
+        [Aliases("regteam", "рег")]
 #pragma warning disable CA1822 // its ok
         internal async Task RegisterTeam(CommandContext ctx, string teamName, string capitan)
 #pragma warning restore CA1822 // its ok
@@ -32,6 +33,7 @@ namespace CaliberTournamentsV2.Commands
         }
 
         [Command("LoadTeams")]
+        [Aliases("добавить")]
 #pragma warning disable CA1822 // its ok
         internal async Task LoadTeams(CommandContext ctx)
 #pragma warning restore CA1822 // its ok
@@ -71,7 +73,7 @@ namespace CaliberTournamentsV2.Commands
         }
 
         [Command("GetRegisteredTeams")]
-        [Aliases("gregteams")]
+        [Aliases("gregteams", "список")]
         internal async Task GetRegisteredTeams(CommandContext ctx, string userOrTeam = "")
         {
             try
@@ -146,7 +148,7 @@ namespace CaliberTournamentsV2.Commands
         }
 
         [Command("RegisterReferee")]
-        [Aliases("regreferee")]
+        [Aliases("regreferee", "судья")]
 #pragma warning disable CA1822 // its ok
         internal async Task RegisterReferee(CommandContext ctx, string referee)
 #pragma warning restore CA1822 // its ok
@@ -199,6 +201,7 @@ namespace CaliberTournamentsV2.Commands
         }
 
         [Command("Stats")]
+        [Aliases("стат")]
         internal async Task GetStatistics(CommandContext ctx, string type = "", string details = "")
         {
             try

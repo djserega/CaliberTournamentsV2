@@ -14,7 +14,7 @@ namespace CaliberTournamentsV2.Commands
     internal class Referee : BaseCommand, ICommands
     {
         [Command("InviteTeams")]
-        [Aliases("team")]
+        [Aliases("team", "тим")]
 #pragma warning disable CA1822 // its ok
         internal async Task InviteTeams(CommandContext ctx, string teamName1, string teamName2)
         {
@@ -41,7 +41,7 @@ namespace CaliberTournamentsV2.Commands
 #pragma warning restore CA1822 // its ok
 
         [Command("StartPickBanMap")]
-        [Aliases("map")]
+        [Aliases("map", "карта")]
 #pragma warning disable CA1822 // its ok
         internal async Task StartPickBanMap(CommandContext ctx, string teamName1, string teamName2, string mode = "")
         {
@@ -86,7 +86,7 @@ namespace CaliberTournamentsV2.Commands
 #pragma warning restore CA1822 // its ok
 
         [Command("StartPickBanOperators")]
-        [Aliases("oper")]
+        [Aliases("oper", "опер")]
 #pragma warning disable CA1822 // its ok
         internal async Task StartOperators(CommandContext ctx, string teamName1, string teamName2)
 #pragma warning restore CA1822 // its ok
@@ -140,7 +140,7 @@ namespace CaliberTournamentsV2.Commands
         }
 
         [Command("ChangeCapitan")]
-        [Aliases("cap")]
+        [Aliases("cap", "капитан")]
 #pragma warning disable CA1822 // its ok
         internal async Task ChangeCapitan(CommandContext ctx, string teamName, string newCapitan)
 #pragma warning restore CA1822 // its ok
