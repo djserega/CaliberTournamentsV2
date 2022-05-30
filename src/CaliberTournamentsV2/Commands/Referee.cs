@@ -187,10 +187,6 @@ namespace CaliberTournamentsV2.Commands
             }
         }
 
-
-        private readonly string _coinEagle = "https://ultragenerator.com/monetka/img/1.png";
-        private readonly string _coinTail = "https://ultragenerator.com/monetka/img/2.png";
-
         [Command("Coin")]
         [Aliases("c", "монетка")]
         internal async Task Coin(CommandContext ctx, string team1, string team2)
@@ -205,13 +201,13 @@ namespace CaliberTournamentsV2.Commands
 
                 bool trueEagle = new Random().Next(0, 100) % 2 == 0;
 
-                string message = $"Выпал{(trueEagle ? " орел" : "а решка")}.\n"
-                    + $"Первым делает выбор команда {Formatter.Bold((trueEagle ? Models.Teams.Team.GetCommand(team1)?.LinkCapitan : Models.Teams.Team.GetCommand(team2)?.LinkCapitan))}";
+                string message = $"Выпал{(trueEagle ? $" {Formatter.Bold("орел")}" : $"а {Formatter.Bold("решка")}")}.\n"
+                    + $"Первым делает выбор команда {Formatter.Bold(trueEagle ? team1 : team2)}. " +
+                    $"Капитан: {Formatter.Bold((trueEagle ? Models.Teams.Team.GetCommand(team1)?.LinkCapitan : Models.Teams.Team.GetCommand(team2)?.LinkCapitan))}";
 
                 Builders.Embeds embed = new Builders.Embeds()
                     .Init()
-                    .AddDescription(message)
-                    .AddImage(trueEagle ? _coinEagle : _coinTail);
+                    .AddDescription(message);
 
                 await ctx.Channel.SendMessageAsync(embed.GetEmbed());
             }
