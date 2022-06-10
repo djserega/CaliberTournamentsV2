@@ -134,7 +134,14 @@ namespace CaliberTournamentsV2.DataHandlers
                         if (pickBanMaps.IdMessageLog == default)
                             pickBanMaps.IdMessageLog = await Bot.DiscordBot.SendMessage(_idChannelLogs, "...");
 
-                        logger.SendMessage(_idChannelLogs, pickBanMaps.IdMessageLog);
+                        try
+                        {
+                            logger.SendMessage(_idChannelLogs, pickBanMaps.IdMessageLog);
+                        }
+                        catch (Exception ex)
+                        {
+                            Worker.LogErr($"Error sending log:\n{ex}");
+                        }
                     }
                 }
 
