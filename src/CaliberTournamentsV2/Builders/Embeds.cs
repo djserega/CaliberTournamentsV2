@@ -13,12 +13,12 @@ namespace CaliberTournamentsV2.Builders
 
         internal int CountFields { get; private set; }
 
-        internal Embeds Init(string author = "Caliber")
+        internal Embeds Init(string author = "Caliber", string color = "#b81831")
         {
             _embedBuilder = new DiscordEmbedBuilder
             {
                 Timestamp = DateTime.Now,
-                Color = new DiscordColor("#b81831")
+                Color = new DiscordColor(color)
             };
 
             if (!string.IsNullOrWhiteSpace(author))
