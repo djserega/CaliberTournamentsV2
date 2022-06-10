@@ -1,10 +1,5 @@
-﻿using DSharpPlus;
-using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using DSharpPlus.Entities;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.DataHandlers
 {
@@ -23,10 +18,10 @@ namespace CaliberTournamentsV2.DataHandlers
         {
             try
             {
-                _allMaps = config?.GetSection("maps").GetStrings() ?? throw new NullReferenceException("Не найден ключ списка карт");
+                _allMaps = config?.GetSection("maps").GetStrings() ?? throw new NullReferenceException("Not found key list access map");
 
                 if (_allMaps.Length == 0)
-                    Worker.LogWarn("Не найдена (не заполнена) группа списка доступных карт");
+                    Worker.LogWarn("Not found/filled list access map");
                 else
                 {
                     Array addedMapsToEnums = Enum.GetValues(typeof(Models.MapsTournamentHacking));

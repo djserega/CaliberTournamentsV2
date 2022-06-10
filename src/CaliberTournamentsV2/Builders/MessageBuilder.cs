@@ -1,9 +1,5 @@
 ﻿using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.Builders
 {
@@ -50,12 +46,6 @@ namespace CaliberTournamentsV2.Builders
 
             return button.Id;
         }
-
-        //Todo AddButtonSeparator
-        //internal void AddButtonSeparator()
-        //{
-        //    Buttons.Add(new(null));
-        //}
 
         internal MessageBuilder AddDescription(string description)
         {
@@ -114,7 +104,6 @@ namespace CaliberTournamentsV2.Builders
             StringBuilder builderCache = new();
 
             builderCache.Append(Description ?? string.Empty);
-            //builderCache.Append(Embeds == null ? string.Empty : Embeds.GetCache());
             builderCache.Append(string.Join(" ", Buttons.Select(el => el.GetCache())));
 
             return builderCache.ToString();

@@ -1,12 +1,4 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DSharpPlus.CommandsNext;
 
 namespace CaliberTournamentsV2.Bot
 {
@@ -18,9 +10,9 @@ namespace CaliberTournamentsV2.Bot
         {
             try
             {
-                Console.WriteLine("Загрузка комманд...");
+                Console.WriteLine("Loading commands...");
 
-                Console.WriteLine("Префикс:" + _config.GetValue<string>("discord:commandPrefix"));
+                Console.WriteLine("Prefix:" + _config.GetValue<string>("discord:commandPrefix"));
 
                 _commands = _discord.UseCommandsNext(new CommandsNextConfiguration()
                 {
@@ -36,18 +28,18 @@ namespace CaliberTournamentsV2.Bot
                 Type[] typeList = typesCommand as Type[] ?? typesCommand.ToArray();
                 foreach (Type typeCommand in typeList)
                 {
-                    Console.WriteLine($" -- загрузка -> {typeCommand.Name}.");
+                    Console.WriteLine($" -- loading -> {typeCommand.Name}.");
 
                     _commands.RegisterCommands(typeCommand);
 
-                    Console.WriteLine($" -- загружено -> {typeCommand.Name}.");
+                    Console.WriteLine($" -- loaded -> {typeCommand.Name}.");
                 }
 
-                Console.WriteLine($" Загружено модулей: {typeList.Length}.");
+                Console.WriteLine($" Loaded modules: {typeList.Length}.");
             }
             catch (Exception ex)
             {
-                throw new InitException("Не удалось инициализировать команды", ex);
+                throw new InitException("Error. Not initialized command modules", ex);
             }
         }
     }

@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.Resources
 {
@@ -34,7 +30,7 @@ namespace CaliberTournamentsV2.Resources
             string name = NameElemetnByDefault;
 
             if (string.IsNullOrEmpty(key))
-                key = "<не найдено>";
+                key = "<not-found>";
 
             if (dict.ContainsKey(key))
                 name = dict[key];
@@ -51,7 +47,7 @@ namespace CaliberTournamentsV2.Resources
             string name = NameElemetnByDefault;
 
             if (string.IsNullOrEmpty(value))
-                name = "<не найдено>";
+                name = "<not-found>";
 
             if (dict.ContainsValue(value))
                 name = dict.First(el => el.Value == value).Key;
@@ -80,10 +76,10 @@ namespace CaliberTournamentsV2.Resources
 
         private static void FillDictNameMap()
             => _dictNameMap = DeserializeJsonString(GetJsonTextResource("NameMaps.json"))
-                ?? throw new NullReferenceException("Не удалось прочитать NameMaps.json");
+                ?? throw new NullReferenceException("Failed loading resource NameMaps.json");
         private static void FillDictNameOperators()
             => _dictNameOperators = DeserializeJsonString(GetJsonTextResource("NameOperators.json"))
-                ?? throw new NullReferenceException("Не удалось прочитать NameOperators.json");
+                ?? throw new NullReferenceException("Failed loading resource NameOperators.json");
 
         private static Dictionary<string, string>? DeserializeJsonString(string value)
             => JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
@@ -96,7 +92,7 @@ namespace CaliberTournamentsV2.Resources
             using (Stream? stream = assembly.GetManifestResourceStream($"CaliberTournamentsV2.Resources.{nameResource}"))
             {
                 if (stream == null)
-                    throw new NullReferenceException($"Не удалось найти ресурс {nameResource}");
+                    throw new NullReferenceException($"Failed loading resource {nameResource}");
 
                 byte[] temp = new byte[stream.Length];
                 stream.Read(temp, 0, temp.Length);

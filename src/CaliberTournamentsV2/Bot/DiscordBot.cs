@@ -1,12 +1,6 @@
 ﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.Bot
 {
@@ -23,7 +17,7 @@ namespace CaliberTournamentsV2.Bot
 
             try
             {
-                Console.WriteLine("Создание дискорд-клиента...");
+                Console.WriteLine("Building discord client...");
 
                 _discord = new DiscordClient(new DiscordConfiguration
                 {
@@ -33,7 +27,7 @@ namespace CaliberTournamentsV2.Bot
             }
             catch (Exception ex)
             {
-                throw new InitException("Не удалось инициализировать дискорд-клиент.", ex);
+                throw new InitException("Error. Discort client not initialized.", ex);
             }
 
             InitCommands(config);

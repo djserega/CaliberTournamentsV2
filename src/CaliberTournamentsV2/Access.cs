@@ -19,20 +19,20 @@ namespace CaliberTournamentsV2
                 _adminUsers = config?.GetSection("admins").GetIDs() ?? Array.Empty<ulong>();
 
                 if (_adminUsers.Length == 0)
-                    Worker.LogWarn("Не найдена (не заполнена) группа админ доступов");
+                    Worker.LogWarn("Not found/filled group access: admin");
                 else
-                    Worker.LogInf($"Админы: {string.Join(", ", _adminUsers)}");
+                    Worker.LogInf($"Admins: {string.Join(", ", _adminUsers)}");
 
                 _refereeUsers = config?.GetSection("referee").GetIDs() ?? Array.Empty<ulong>();
 
                 if (_refereeUsers.Length == 0)
-                    Worker.LogWarn("Не найдена (не заполнена) группа доступов для судей");
+                    Worker.LogWarn("Not found/filled group access: referee");
                 else
-                    Worker.LogInf($"Судьи: {string.Join(", ", _refereeUsers)}");
+                    Worker.LogInf($"Referee: {string.Join(", ", _refereeUsers)}");
             }
             catch (Exception ex)
             {
-                throw new InitException("Не удалось загрузить базовые параметры настроек", ex);
+                throw new InitException("Error loading base access parameters", ex);
             }
         }
 
@@ -76,7 +76,7 @@ namespace CaliberTournamentsV2
         private static void SendErrorAccess(DiscordUser user, string detailed)
         {
             string prefix = string.IsNullOrEmpty(detailed) ? "" : $"{detailed}. ";
-            Worker.LogErr($"{prefix}Ошибка доступа. {user.Username}#{user.Discriminator}");
+            Worker.LogErr($"{prefix}Access denied. {user.Username}#{user.Discriminator}");
         }
     }
 }

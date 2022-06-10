@@ -2,11 +2,7 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.Commands
 {
@@ -28,7 +24,7 @@ namespace CaliberTournamentsV2.Commands
             }
             catch (Exception ex)
             {
-                Worker.LogErr($"InviteTeams. {ex}");
+                Worker.LogErr($"RegisterTeam. {ex}");
             }
         }
 
@@ -59,7 +55,7 @@ namespace CaliberTournamentsV2.Commands
                     }
                 }
 
-                if (builderResult.Length > 2000)
+                if (builderResult.Length > 1000)
                     await ctx.Channel.SendMessageAsync("Добавлено команд: " + addedCommand);
                 else
                     await ctx.Channel.SendMessageAsync(builderResult.ToString());
@@ -168,7 +164,7 @@ namespace CaliberTournamentsV2.Commands
             }
             catch (Exception ex)
             {
-                Worker.LogErr(ex.ToString());
+                Worker.LogErr($"RegisterReferee. {ex}");
             }
         }
 
@@ -196,7 +192,7 @@ namespace CaliberTournamentsV2.Commands
             }
             catch (Exception ex)
             {
-                Worker.LogErr(ex.ToString());
+                Worker.LogErr($"GetInfo. {ex}");
             }
         }
 
@@ -243,13 +239,14 @@ namespace CaliberTournamentsV2.Commands
             }
             catch (Exception ex)
             {
-                Worker.LogErr(ex.ToString());
+                Worker.LogErr($"GetStatistics. {ex}");
             }
         }
 
         private static string AddTeam(string teamName, string capitan)
         {
             string message = string.Empty;
+            string logMessage = string.Empty;
 
             if (Models.Teams.Team.TeamIsRegistered(teamName))
                 message = $"Команда {teamName} уже зарегистрирована";
@@ -266,7 +263,9 @@ namespace CaliberTournamentsV2.Commands
                 }
                 catch (ArgumentNullException ex)
                 {
-                    message = ex.Message;
+                    message = "Возникла ошибка...";
+                    logMessage = ex.Message;
+                    Worker.LogErr(logMessage);
                 }
 
                 if (newTeam != null)
@@ -274,10 +273,10 @@ namespace CaliberTournamentsV2.Commands
                     Models.Teams.Team.AddTeam(newTeam);
 
                     message = $"Добавлена команда {Formatter.Bold(teamName)}. Капитан: {Formatter.Bold(newTeam.Capitan?.Name)}#{Formatter.Bold(newTeam.Capitan?.Discriminator)}";
+                    logMessage = $"Add command {teamName}. Capitan {newTeam.Capitan?.Name}#{newTeam.Capitan?.Discriminator}";
+                    
+                    Worker.LogInf(logMessage);
                 }
-
-                Worker.LogInf(message);
-
             }
 
             return message;

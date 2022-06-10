@@ -2,12 +2,6 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.Commands
 {
@@ -80,7 +74,7 @@ namespace CaliberTournamentsV2.Commands
             }
             catch (Exception ex)
             {
-                Worker.LogErr($"InviteTeams. {ex}");
+                Worker.LogErr($"StartPickBanMap. {ex}");
             }
         }
 #pragma warning restore CA1822 // its ok
@@ -97,15 +91,17 @@ namespace CaliberTournamentsV2.Commands
                     return;
 
                 string message = string.Empty;
+                string logMessage = string.Empty;
 
                 Models.Referee.StartPickBan? pickBan = Models.Referee.StartPickBan.GetPickBan(teamName1, teamName2);
 
                 if (pickBan != null)
                 {
                     if (pickBan.PickBanMap.IsActive)
-                        message = $"У команд ещё не завершено голосование карт.";
-                    //else if (pickBan.PickBanMap.PickBanDetailed.Any(el => el.Operators.IsActive && !el.PickBanOperatorsIsEnded))
-                    //    message = $"У команд есть не завершенное голосование по оперативникам";
+                    {
+                        message = $"У команд {Formatter.Bold(teamName1)} и {Formatter.Bold(teamName2)} ещё не завершено голосование карт.";
+                        logMessage = $"A commands: {teamName1} and {teamName2} voting map is not ended";
+                    }
                     else if (pickBan.PickBanMap.PickBanDetailed.Any(el => (el.PickBanType != Models.PickBanType.ban || el.PickBanType != Models.PickBanType.none) && !el.PickBanOperatorsIsEnded))
                     {
                         string? resultError = pickBan.FillPickBanOperators(Models.Teams.Team.GetCommand(teamName1), Models.Teams.Team.GetCommand(teamName2));
@@ -122,10 +118,16 @@ namespace CaliberTournamentsV2.Commands
                             message = resultError ?? string.Empty;
                     }
                     else
+                    {
                         message = $"У команд {Formatter.Bold(teamName1)} и {Formatter.Bold(teamName2)} голосование по оперативникам на картах завершено";
+                        logMessage = $"A commands: {teamName1} and {teamName2} voting operators ended";
+                    }
                 }
                 else
+                {
                     message = $"Не найдено голосований команд {Formatter.Bold(teamName1)} и {Formatter.Bold(teamName2)}";
+                    logMessage = $"Not found voing map for commands: {teamName1} and {teamName2}";
+                }
 
                 if (!string.IsNullOrEmpty(message))
                 {
@@ -135,7 +137,7 @@ namespace CaliberTournamentsV2.Commands
             }
             catch (Exception ex)
             {
-                Worker.LogErr($"InviteTeams. {ex}");
+                Worker.LogErr($"StartOperators. {ex}");
             }
         }
 
@@ -178,7 +180,7 @@ namespace CaliberTournamentsV2.Commands
 
                     MessageQueue.Add(ctx.Channel.Id, $"Новым капитаном команды {teamNewCapitan.Name} является {currentCapitan}");
 
-                    Worker.LogWarn($"Изменен капитан команды {teamNewCapitan.Name} с {previousCapitan} на {currentCapitan}");
+                    Worker.LogWarn($"Changed capitan {teamNewCapitan.Name} with {previousCapitan} to {currentCapitan}");
                 }
             }
             catch (Exception ex)
@@ -215,7 +217,7 @@ namespace CaliberTournamentsV2.Commands
             }
             catch (Exception ex)
             {
-                Worker.LogErr($"InviteTeams. {ex}");
+                Worker.LogErr($"Coin. {ex}");
             }
         }
 

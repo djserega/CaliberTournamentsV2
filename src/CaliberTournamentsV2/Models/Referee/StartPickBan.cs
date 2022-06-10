@@ -1,10 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.Models.Referee
 {
@@ -27,9 +22,14 @@ namespace CaliberTournamentsV2.Models.Referee
         {
             Mode = mode.ToLower() switch
             {
+                "бо1" => PickBanMode.bestOf1,
+                "бо3" => PickBanMode.bestOf3,
+                "бо5" => PickBanMode.bestOf5,
+                
                 "bo1" => PickBanMode.bestOf1,
                 "bo3" => PickBanMode.bestOf3,
                 "bo5" => PickBanMode.bestOf5,
+                
                 _ => PickBanMode.bestOf3,
             };
         }

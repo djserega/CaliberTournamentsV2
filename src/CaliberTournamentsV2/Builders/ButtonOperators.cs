@@ -1,10 +1,5 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.Builders
 {
@@ -66,16 +61,13 @@ namespace CaliberTournamentsV2.Builders
 
                     if (_cacheSendedButton[Channel.Id].Any(el => el == builderButtonHash))
                     {
-                        //if (countNonPickedOperators == 0 || countNonPickedOperators == 2)
                         if (countNonPickedOperators == 1)
                         {
                             _cacheSendedButton[Channel.Id].Remove(builderButtonHash);
-                            //Worker.LogInf($"Удалён кэш. Канал: {Channel.Id}. Класс: {classOperator}. ID: {builderButtonHash}");
                             builderButtonHash = string.Empty;
                         }
                         else
                         {
-                            //Worker.LogInf($"Найден кэш. Канал: {Channel.Id}. Класс: {classOperator}. ID: {builderButtonHash}");
                             sendMessage = false;
                         }
                     }
@@ -87,7 +79,6 @@ namespace CaliberTournamentsV2.Builders
                 {
                     if (!string.IsNullOrEmpty(builderButtonHash))
                     {
-                        //Worker.LogInf($"Создан кэш. Канал: {Channel.Id}. Класс: {classOperator}. ID: {builderButtonHash}");
                         _cacheSendedButton[Channel.Id].Add(builderButtonHash);
                     }
 
@@ -107,7 +98,7 @@ namespace CaliberTournamentsV2.Builders
                         catch (Exception ex)
                         {
                             Worker.LogErr(ex.ToString());
-                            Worker.LogWarn("Попытка отправки сообщения через очередь:");
+                            Worker.LogWarn("Sending queue message:");
 
 #pragma warning disable IDE0039 // its ok
                             Action<ulong> action = (ulong messageId) => { DetailedOperators.ClassOperatorsMessages.Add(classOperator, messageId); };

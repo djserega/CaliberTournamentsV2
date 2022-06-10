@@ -1,10 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.Models.PickBans
 {
@@ -17,7 +11,6 @@ namespace CaliberTournamentsV2.Models.PickBans
             TeamOperators = new();
         }
 
-        //[JsonProperty]
         internal Dictionary<Teams.Team, List<PickOperatorsData>> TeamOperators { get; set; }
 
         internal record TeamOperatorsRecord 

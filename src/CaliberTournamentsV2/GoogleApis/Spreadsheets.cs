@@ -4,18 +4,13 @@ using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CaliberTournamentsV2.GoogleApis
 {
     internal class Spreadsheets
     {
-        private const string _spreadsheetId = "1qdETrsfY2dks_HjtOZ3lkHcSFl5VFF7jAJWvVlUlyls"; //Caliber
+        private const string _spreadsheetId = "1qdETrsfY2dks_HjtOZ3lkHcSFl5VFF7jAJWvVlUlyls";
 
         //#pragma warning disable CS0414 // its ok
         private int? _currentSheetId = 671616174; // Caliber

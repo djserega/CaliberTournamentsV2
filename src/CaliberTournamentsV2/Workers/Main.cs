@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace CaliberTournamentsV2
 {
@@ -20,7 +15,7 @@ namespace CaliberTournamentsV2
         {
             try
             {
-                Console.WriteLine("Инициализация config-файла...");
+                Console.WriteLine("Initializing config-file...");
 
                 _config = new ConfigurationBuilder()
                     .SetBasePath(new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName)
@@ -29,7 +24,7 @@ namespace CaliberTournamentsV2
             }
             catch (Exception ex)
             {
-                throw new InitException("Не удалось инициализировать config-файл.", ex);
+                throw new InitException("Failed initializing config-file.", ex);
             }
         }
 
