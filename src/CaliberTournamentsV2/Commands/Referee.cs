@@ -205,8 +205,10 @@ namespace CaliberTournamentsV2.Commands
                     + $"Первым делает выбор команда {Formatter.Bold(trueEagle ? team1 : team2)}. " +
                     $"Капитан: {Formatter.Bold((trueEagle ? Models.Teams.Team.GetCommand(team1)?.LinkCapitan : Models.Teams.Team.GetCommand(team2)?.LinkCapitan))}";
 
+                string color = trueEagle ? "#0035ff" : "#ffaf00";
+
                 Builders.Embeds embed = new Builders.Embeds()
-                    .Init()
+                    .Init(color: color)
                     .AddDescription(message);
 
                 await ctx.Channel.SendMessageAsync(embed.GetEmbed());
