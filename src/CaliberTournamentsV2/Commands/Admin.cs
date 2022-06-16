@@ -29,7 +29,7 @@ namespace CaliberTournamentsV2.Commands
         }
 
         [Command("LoadTeams")]
-        [Aliases("добавить")]
+        [Aliases("добавить", "lt")]
 #pragma warning disable CA1822 // its ok
         internal async Task LoadTeams(CommandContext ctx)
 #pragma warning restore CA1822 // its ok
