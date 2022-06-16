@@ -1,7 +1,7 @@
 ﻿namespace CaliberTournamentsV2.Models
 {
     public enum PickBanKind { map, operators }
-    public enum PickBanType { none, ban, pick }
+    public enum PickBanType { empty, none, ban, pick }
     public enum PickBanMode { bestOf1, bestOf3, bestOf5 }
 
 
