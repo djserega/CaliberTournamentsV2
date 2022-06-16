@@ -28,6 +28,7 @@ namespace CaliberTournamentsV2
                 embedsLogMaps.AddField("Период", $"{LogsMaps.DateStart.GetFormattedTime()}-{LogsMaps.DateEnd.GetFormattedTime()}", true);
                 embedsLogMaps.AddField("Пик", LogsMaps.GetFormatterDetailed(Models.PickBanType.pick), true);
                 embedsLogMaps.AddField("Бан", LogsMaps.GetFormatterDetailed(Models.PickBanType.ban), true);
+                embedsLogMaps.AddField("Десайдер", LogsMaps.GetFormatterDetailed(Models.PickBanType.none), true);
 
                 _logBuilder.AddEmbed(embedsLogMaps.GetEmbed());
 
@@ -38,7 +39,7 @@ namespace CaliberTournamentsV2
                     {
 
                         Builders.Embeds embedsLogOperators = new Builders.Embeds()
-                            .Init($"{author}. Карта {Formatter.Bold(itemMap.PickBanName)}")
+                            .Init($"{author}. Карта {itemMap.PickBanName}")
                             .AddDescription(description);
 
                         embedsLogOperators.AddField("Период", $"{itemMap.Operators.DateStart.GetFormattedTime()}-{itemMap.Operators.DateEnd.GetFormattedTime()}", true);
