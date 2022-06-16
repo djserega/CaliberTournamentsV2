@@ -137,6 +137,7 @@ namespace CaliberTournamentsV2.Commands
             }
             catch (Exception ex)
             {
+                await ctx.Channel.SendMessageAsync("Ошибка команды голосования операвников");
                 Worker.LogErr($"StartOperators. {ex}");
             }
         }

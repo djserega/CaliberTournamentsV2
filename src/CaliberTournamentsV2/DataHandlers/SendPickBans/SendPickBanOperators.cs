@@ -134,6 +134,7 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
             }
             catch (Exception ex)
             {
+                await _channel.SendMessageAsync("Ошибка обработки команды голосования операвников");
                 Worker.LogErr(ex.ToString());
             }
 
