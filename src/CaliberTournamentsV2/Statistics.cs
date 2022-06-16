@@ -29,7 +29,7 @@ namespace CaliberTournamentsV2
                     .Select(el2 => el2.Operators))
                 .SelectMany(el => el.PickBanDetailed);
 
-            return GetEmbedStatistics(listDetailedOperators, details, Models.StatisticTypes.operators);
+            return GetEmbedStatistics(listDetailedOperators, details, Models.StatisticTypes.operators, el => el.Cheched);
         }
 
         private DiscordEmbed GetStatMaps(Models.StatisticDetailedTypes details)
@@ -38,13 +38,15 @@ namespace CaliberTournamentsV2
 
             IEnumerable<Models.PickBans.PickBanDetailed> listDetailsMaps = listData
                 .Select(el => el.PickBanMap)
-                .SelectMany(el => el.PickBanDetailed)
-                    .Where(el => el.Cheched);
+                .SelectMany(el => el.PickBanDetailed);
 
-            return GetEmbedStatistics(listDetailsMaps, details, Models.StatisticTypes.maps);
+            return GetEmbedStatistics(listDetailsMaps, details, Models.StatisticTypes.maps, el => !string.IsNullOrEmpty(el.PickBanName));
         }
 
-        private DiscordEmbed GetEmbedStatistics(IEnumerable<Models.PickBans.PickBanDetailed> listSelectedData, Models.StatisticDetailedTypes details, Models.StatisticTypes type)
+        private DiscordEmbed GetEmbedStatistics(IEnumerable<Models.PickBans.PickBanDetailed> listSelectedData,
+                                                Models.StatisticDetailedTypes details,
+                                                Models.StatisticTypes type,
+                                                Func<Models.PickBans.PickBanDetailed, bool> predicateNoneType)
         {
 
 #pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
@@ -52,12 +54,13 @@ namespace CaliberTournamentsV2
             {
                 Models.StatisticDetailedTypes.picked => listSelectedData.Where(el => el.PickBanType == Models.PickBanType.pick && el.Cheched),
                 Models.StatisticDetailedTypes.banned => listSelectedData.Where(el => el.PickBanType == Models.PickBanType.ban && el.Cheched),
-                Models.StatisticDetailedTypes.none => listSelectedData.Where(el => el.Cheched),
+                Models.StatisticDetailedTypes.none => listSelectedData.Where(predicateNoneType),
             };
 #pragma warning restore CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
 
             Dictionary<string, int> dictPicked = new();
             Dictionary<string, int> dictBanned = new();
+            Dictionary<string, int> dictDecider = new();
 
             foreach (Models.PickBans.PickBanDetailed item in filterData)
             {
@@ -65,6 +68,8 @@ namespace CaliberTournamentsV2
                     UpdateDictionary(dictPicked, item.PickBanName ?? string.Empty);
                 else if (item.PickBanType == Models.PickBanType.ban)
                     UpdateDictionary(dictBanned, item.PickBanName ?? string.Empty);
+                else if (item.PickBanType == Models.PickBanType.none)
+                    UpdateDictionary(dictDecider, item.PickBanName ?? string.Empty);
             }
 
             Builders.Embeds embedsMessage = new Builders.Embeds()
@@ -76,30 +81,32 @@ namespace CaliberTournamentsV2
             if (details == Models.StatisticDetailedTypes.picked
                 || details == Models.StatisticDetailedTypes.none)
             {
-                IOrderedEnumerable<KeyValuePair<string, int>> sortedDataPicked = dictPicked.OrderByDescending(el => el.Value);
-
-                foreach (KeyValuePair<string, int> item in sortedDataPicked)
-                    builderResult.AppendLine($"{item.Key} - {item.Value}");
-
-                embedsMessage.AddField("Picked", builderResult.ToString(), true);
-                
-                builderResult.Clear();
+                FilledDataFromDictionary("Picked", embedsMessage, builderResult, dictPicked.OrderByDescending(el => el.Value));
             }
 
             if (details == Models.StatisticDetailedTypes.banned
                 || details == Models.StatisticDetailedTypes.none)
             {
-                IOrderedEnumerable<KeyValuePair<string, int>> sortedDataBanned = dictBanned.OrderByDescending(el => el.Value);
+                FilledDataFromDictionary("Banned", embedsMessage, builderResult, dictBanned.OrderByDescending(el => el.Value));
+            }
 
-                foreach (KeyValuePair<string, int> item in sortedDataBanned)
-                    builderResult.AppendLine($"{item.Key} - {item.Value}");
-
-                embedsMessage.AddField("Banned", builderResult.ToString(), true);
-
-                builderResult.Clear();
+            if (details == Models.StatisticDetailedTypes.none
+                || details == Models.StatisticDetailedTypes.none)
+            {
+                FilledDataFromDictionary("Decider", embedsMessage, builderResult, dictDecider.OrderByDescending(el => el.Value));
             }
 
             return embedsMessage.GetEmbed();
+        }
+
+        private static void FilledDataFromDictionary(string fieldName, Builders.Embeds embedsMessage, StringBuilder builderResult, IOrderedEnumerable<KeyValuePair<string, int>> sortedDataPicked)
+        {
+            foreach (KeyValuePair<string, int> item in sortedDataPicked)
+                builderResult.AppendLine($"{item.Key} - {item.Value}");
+
+            embedsMessage.AddField(fieldName, builderResult.ToString(), true);
+
+            builderResult.Clear();
         }
 
         private static void UpdateDictionary(Dictionary<string, int> dict, string key)
