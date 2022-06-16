@@ -102,7 +102,7 @@ namespace CaliberTournamentsV2.Commands
                         message = $"У команд {Formatter.Bold(teamName1)} и {Formatter.Bold(teamName2)} ещё не завершено голосование карт.";
                         logMessage = $"A commands: {teamName1} and {teamName2} voting map is not ended";
                     }
-                    else if (pickBan.PickBanMap.PickBanDetailed.Any(el => (el.PickBanType != Models.PickBanType.ban || el.PickBanType != Models.PickBanType.none) && !el.PickBanOperatorsIsEnded))
+                    else if (pickBan.PickBanMap.PickBanDetailed.Any(el => el.PickBanType != Models.PickBanType.ban && !el.PickBanOperatorsIsEnded))
                     {
                         string? resultError = pickBan.FillPickBanOperators(Models.Teams.Team.GetCommand(teamName1), Models.Teams.Team.GetCommand(teamName2));
 
