@@ -78,10 +78,12 @@ namespace CaliberTournamentsV2.Models.Referee
 
         internal static StartPickBan? GetPickBan(string team1, string team2)
         {
-            if (ListPickBans.Any(el => el.Team1Name == team1 && el.Team2Name == team2))
-                return ListPickBans.Last(el => el.Team1Name == team1 && el.Team2Name == team2);
-            if (ListPickBans.Any(el => el.Team2Name == team1 && el.Team1Name == team2))
-                return ListPickBans.Last(el => el.Team2Name == team1 && el.Team1Name == team2);
+            if (ListPickBans.Any(el => el.Team1Name == team1 && el.Team2Name == team2
+                                || el.Team2Name == team1 && el.Team1Name == team2))
+                return ListPickBans.Last(el => el.Team1Name == team1 && el.Team2Name == team2
+                                        || el.Team2Name == team1 && el.Team1Name == team2);
+            //if (ListPickBans.Any(el => el.Team2Name == team1 && el.Team1Name == team2))
+            //    return ListPickBans.Last(el => el.Team2Name == team1 && el.Team1Name == team2);
             else
                 return default;
         }
