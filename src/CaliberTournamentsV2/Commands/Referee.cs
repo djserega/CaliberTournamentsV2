@@ -8,7 +8,7 @@ namespace CaliberTournamentsV2.Commands
     internal class Referee : BaseCommand, ICommands
     {
         [Command("InviteTeams")]
-        [Aliases("team", "тим")]
+        [Aliases("team", "тим", "команды")]
 #pragma warning disable CA1822 // its ok
         internal async Task InviteTeams(CommandContext ctx, string teamName1, string teamName2)
         {
