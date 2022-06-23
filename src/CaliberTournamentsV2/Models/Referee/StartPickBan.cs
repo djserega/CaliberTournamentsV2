@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace CaliberTournamentsV2.Models.Referee
 {
@@ -84,6 +85,15 @@ namespace CaliberTournamentsV2.Models.Referee
             else
                 return default;
         }
+        internal static IEnumerable<StartPickBan>? GetPickBans(string team1, string team2)
+        {
+            if (ListPickBans.Any(el => el.Team1Name == team1 && el.Team2Name == team2))
+                return ListPickBans.Where(el => el.Team1Name == team1 && el.Team2Name == team2);
+            if (ListPickBans.Any(el => el.Team2Name == team1 && el.Team1Name == team2))
+                return ListPickBans.Where(el => el.Team2Name == team1 && el.Team1Name == team2);
+            else
+                return default;
+        }
 
         internal void FillPickBansMap()
         {
@@ -129,7 +139,7 @@ namespace CaliberTournamentsV2.Models.Referee
             return default;
         }
 
-        private static void AddDetails(PickBans.PickBanOperators operators, Teams.Team team1, Teams.Team team2)
+        internal static void AddDetails(PickBans.PickBanOperators operators, Teams.Team team1, Teams.Team team2)
         {
             operators.TeamOperators.Add(
                 team1,
@@ -163,6 +173,22 @@ namespace CaliberTournamentsV2.Models.Referee
             operators.AddDetails(team1, PickBanType.pick);
             operators.AddDetails(team2, PickBanType.pick);
             operators.AddDetails(team1, PickBanType.pick);
+        }
+    
+    
+        internal string GetMainInfo(StringBuilder sb)
+        {
+            sb.Append("Id: ");
+            sb.AppendLine(Id.ToString());
+            sb.Append("Судья:");
+            sb.AppendLine(NameReferee);
+            sb.Append("Режим:");
+            sb.AppendLine(Mode.ToString());
+
+            string info = sb.ToString();
+            sb.Clear();
+
+            return info;
         }
     }
 }

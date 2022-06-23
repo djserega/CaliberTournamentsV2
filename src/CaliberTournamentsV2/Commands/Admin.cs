@@ -243,6 +243,135 @@ namespace CaliberTournamentsV2.Commands
             }
         }
 
+        [Command("GetVotingStatus")]
+        [Aliases("голосования")]
+        internal async Task GetVotingStatus(CommandContext ctx)
+        {
+            try
+            {
+                if (!Access.IsAdmin(ctx.User, "GetVotingStatus"))
+                    return;
+
+                Builders.Embeds embed = new Builders.Embeds()
+                    .Init()
+                    .AddDescription("Статус голосования команд");
+
+                StringBuilder sb = new();
+                sb.Append("Всего команд:");
+                sb.AppendLine(Models.Referee.StartPickBan.ListPickBans.Count.ToString());
+
+                sb.Append("Запущено голосований:");
+                sb.AppendLine(Models.Referee.StartPickBan.ListPickBans.Where(el => el.PickBanMap.IsActive).Count().ToString());
+
+                sb.Append("Завершено голосований:");
+                sb.AppendLine(Models.Referee.StartPickBan.ListPickBans.Where(el => el.PickBanMap.IsEnded).Count().ToString());
+
+                embed.AddField("Детали", sb.ToString());
+
+                MessageQueue.Add(ctx.Channel.Id, embed: embed.GetEmbed());
+            }
+            catch (Exception ex)
+            {
+                Worker.LogErr($"GetVotingStatus. {ex}");
+            }
+        }
+
+        [Command("GetDetailedVotingTeams")]
+        [Aliases("детали")]
+        internal async Task GetDetailedVotingTeams(CommandContext ctx, string team1 = "", string team2 = "")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(team1) || string.IsNullOrWhiteSpace(team2))
+                    return;
+
+                if (!Access.IsAdmin(ctx.User, "GetDetailedVotingTeams"))
+                    return;
+
+                IEnumerable<Models.Referee.StartPickBan>? pickBans = Models.Referee.StartPickBan.GetPickBans(team1, team2);
+                if (pickBans == default)
+                {
+                    MessageQueue.Add(ctx.Channel, $"Голосований команд {Formatter.Bold(team1)} и {Formatter.Bold(team2)} не найдено.");
+                    return;
+                }
+
+                Builders.Embeds embed = new Builders.Embeds()
+                    .Init()
+                    .AddDescription($"Голосования команд {team1} и {team2}");
+
+
+                StringBuilder sb = new();
+
+                foreach (Models.Referee.StartPickBan itemPickBan in pickBans)
+                {
+                    embed.AddField("Основная информация", itemPickBan.GetMainInfo(sb), true);
+                    embed.AddField("Голосование по картам", itemPickBan.PickBanMap.GetMainInfo(sb), true);
+                    embed.AddField("\u200b", "\u200b");
+                }
+
+                MessageQueue.Add(ctx.Channel.Id, embed.GetEmbed());
+            }
+            catch (Exception ex)
+            {
+                Worker.LogErr($"GetDetailedVotingTeams. {ex}");
+            }
+        }
+
+        [Command("RemoveVotingOperators")]
+        [Aliases("удалить")]
+        internal async Task RemoveVotingOperators(CommandContext ctx, string team1 = "", string team2 = "", int idPickban = 99999, int idMap = 99999)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(team1) || string.IsNullOrWhiteSpace(team2) || idPickban == 99999 || idMap == 99999)
+                    return;
+
+                if (!Access.IsAdmin(ctx.User, "RemoveVotingOperators"))
+                    return;
+
+                IEnumerable<Models.Referee.StartPickBan>? pickBans = Models.Referee.StartPickBan.GetPickBans(team1, team2);
+                if (pickBans == default)
+                {
+                    MessageQueue.Add(ctx.Channel, $"Голосований команд {Formatter.Bold(team1)} и {Formatter.Bold(team2)} не найдено.");
+                    return;
+                }
+
+                if (!pickBans.Any(el => el.Id == idPickban))
+                {
+                    MessageQueue.Add(ctx.Channel, $"Не найдено id голосования {Formatter.Bold(idPickban.ToString())}.");
+                    return;
+                }
+
+                Models.Referee.StartPickBan pickBan = pickBans.First(el => el.Id == idPickban);
+
+                if (!pickBan.PickBanMap.PickBanDetailed.Any(el => el.Id == idMap))
+                {
+                    MessageQueue.Add(ctx.Channel, $"Не найдено id карты {Formatter.Bold(idMap.ToString())}.");
+                    return;
+                }
+
+                Models.PickBans.PickBanDetailed pickBanDetailed = pickBan.PickBanMap.PickBanDetailed.First(el => el.Id == idMap);
+
+
+
+                Builders.Embeds embed = new Builders.Embeds()
+                    .Init()
+                    .AddDescription($"Отмена голосования оперативников на карте {pickBanDetailed.PickBanName} от {team1} и {team2}");
+
+                Builders.MessageBuilder builder = new Builders.MessageBuilder()
+                    .AddEmbed(embed.GetEmbed());
+                builder.AddButton("Удалить голосование", false, ButtonStyle.Danger, $"removeVoting_{idPickban}_{idMap}_accept");
+                builder.AddButton("Отмена", false, ButtonStyle.Primary, $"removeVoting_{idPickban}_{idMap}_rejected");
+
+
+                MessageQueue.Add(ctx.Channel.Id, builder.GetMessage());
+            }
+            catch (Exception ex)
+            {
+                Worker.LogErr($"RemoveVotingOperators. {ex}");
+            }
+        }
+
         private static string AddTeam(string teamName, string capitan)
         {
             string message = string.Empty;
@@ -274,7 +403,7 @@ namespace CaliberTournamentsV2.Commands
 
                     message = $"Добавлена команда {Formatter.Bold(teamName)}. Капитан: {Formatter.Bold(newTeam.Capitan?.Name)}#{Formatter.Bold(newTeam.Capitan?.Discriminator)}";
                     logMessage = $"Add command {teamName}. Capitan {newTeam.Capitan?.Name}#{newTeam.Capitan?.Discriminator}";
-                    
+
                     Worker.LogInf(logMessage);
                 }
             }

@@ -48,7 +48,7 @@ namespace CaliberTournamentsV2.Models.PickBans
 
             return default;
         }
-    
+
         internal string GetFormatterDetailed(PickBanType? type = null)
         {
             StringBuilder result = new();
@@ -69,6 +69,39 @@ namespace CaliberTournamentsV2.Models.PickBans
             builder.Append(detailed?.Team?.Name);
             builder.Append(" - ");
             builder.AppendLine(detailed?.PickBanName);
+        }
+
+
+        internal string GetMainInfo(StringBuilder sb)
+        {
+            sb.Append("Время: ");
+            sb.Append(DateStart.ToString("HH:mm:ss"));
+            sb.Append(" - ");
+            sb.AppendLine(DateEnd.ToString("HH:mm:ss"));
+
+            foreach (PickBanDetailed itemDetailed in PickBanDetailed)
+            {
+                if (itemDetailed.Team != null)
+                {
+                    sb.Append("Id: ");
+                    sb.Append(itemDetailed.Id.ToString());
+                    sb.Append(" - ");
+                    sb.Append(itemDetailed.Team?.Name);
+                    sb.Append(" - ");
+                    sb.Append(itemDetailed.PickBanName);
+                    if (itemDetailed.CheckedDateTime != null)
+                    {
+                        sb.Append(" (");
+                        sb.Append(itemDetailed.CheckedDateTime?.ToString("HH:mm:ss"));
+                        sb.Append(')');
+                    }
+                    sb.AppendLine();
+                }
+            }
+
+            string info = sb.ToString();
+            sb.Clear();
+            return info;
         }
     }
 }

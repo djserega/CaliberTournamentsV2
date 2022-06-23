@@ -42,7 +42,71 @@ namespace CaliberTournamentsV2.Bot
             if (MessageQueue.ChannelIsQueue(e.Channel.Id))
                 return;
 
-            await Task.Run(() => DataHandlers.DataHandler.ReceivedPickBanMessagesEvent(e.Channel, e.Message, e.User.Id, e.Id));
+            if (e.Id.StartsWith("removeVoting_"))
+            {
+                if (e.Id.Contains("_rejected"))
+                {
+                    Builders.MessageBuilder builder = new();
+
+                    Builders.Embeds embeds = new Builders.Embeds()
+                        .Init();
+
+                    string newDescription = string.Empty;
+                    if (e.Message.Embeds.Count > 0)
+                        newDescription = e.Message.Embeds.First().Description;
+
+                    embeds.AddDescription($"{newDescription}\n\nУдаление голосования отменено пользователем {Formatter.Bold(e.User.Username)}");
+
+                    builder.AddEmbed(embeds.GetEmbed());
+
+                    await e.Message.ModifyAsync(builder.GetMessage());
+                }
+                else
+                {
+                    Builders.MessageBuilder builder = new();
+                    string newDescription = string.Empty;
+                    if (e.Message.Embeds.Count > 0)
+                        newDescription = e.Message.Embeds[0].Description;
+
+                    try
+                    {
+                        string idWithoutPrefix = e.Id.TrimStart("removeVoting_".ToCharArray());
+
+                        int indexDelimeterStart = idWithoutPrefix.IndexOf('_');
+                        int indexDelimeterEnd = idWithoutPrefix.IndexOf('_', indexDelimeterStart + 1);
+
+                        Models.Referee.StartPickBan pickBan = Models.Referee.StartPickBan.ListPickBans.First(el => el.Id == int.Parse(idWithoutPrefix[..indexDelimeterStart]));
+
+                        Models.PickBans.PickBanDetailed pickBanDetailed = pickBan.PickBanMap.PickBanDetailed.First(el => el.Id == int.Parse(idWithoutPrefix[(indexDelimeterStart + 1)..indexDelimeterEnd]));
+
+                        pickBanDetailed.Operators.DetailedIds.Clear();
+                        pickBanDetailed.Operators.PickBanDetailed.Clear();
+                        pickBanDetailed.Operators.TeamOperators.Clear();
+
+                        if (pickBan.Team1 != null && pickBan.Team2 != null)
+                            Models.Referee.StartPickBan.AddDetails(pickBanDetailed.Operators, pickBan.Team1, pickBan.Team2);
+
+                        pickBanDetailed.Operators.DateEnd = default;
+
+                        Builders.Embeds embeds = new Builders.Embeds()
+                            .Init();
+
+                        embeds.AddDescription($"{newDescription}\n\nПользователь {Formatter.Bold(e.User.Username)} подтвердил удаление голосования");
+
+                        builder.AddEmbed(embeds.GetEmbed());
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Worker.LogErr(ex.ToString());
+                        newDescription += "\n\nУпс... Не удалось удалить голосование...";
+                    }
+
+                    await e.Message.ModifyAsync(builder.GetMessage());
+                }
+            }
+            else
+                await Task.Run(() => DataHandlers.DataHandler.ReceivedPickBanMessagesEvent(e.Channel, e.Message, e.User.Id, e.Id));
 
             try { await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate); }
             catch { }
