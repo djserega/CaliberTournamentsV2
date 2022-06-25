@@ -152,8 +152,9 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
 
             builderButton = new Builders.MessageBuilder()
                 .AddDescription(
-                    $"Карта: {detailedMap.PickBanName}.\n\n" +
-                    $"{pickOrBanEmoji} {Formatter.Bold(pickOrBan)} оперативника от капитана команды {Formatter.Bold(currentTeam?.Name)} {linkCapitan}");
+                    $"{pickOrBanEmoji} {Formatter.Bold(pickOrBan)} оперативника от капитана команды {Formatter.Bold(currentTeam?.Name)} {linkCapitan}\n");
+
+            builderButton.AddEmbed(GetEmbedPickedOperators(detailedMap.Operators, $"Предварительные данные на карту {Formatter.Bold(detailedMap.PickBanName)}:"));
 
             return builderButton;
         }
@@ -162,19 +163,34 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
                                                                  string mapName,
                                                                  Models.PickBans.PickBanOperators operators)
         {
-            Builders.MessageBuilder builderButton;
+            string description = $"Голосование команд {Formatter.Bold(data.Team1Name)} и {Formatter.Bold(data.Team2Name)} по выбору оперативников завершено.\n" +
+                $"Бои пройдут на карте {Formatter.Bold(mapName)} на следующих оперативниках:";
+
+            DiscordEmbed embedPickedOperators = GetEmbedPickedOperators(operators, description);
+
+            Builders.MessageBuilder builderButton = new Builders.MessageBuilder()
+                .AddEmbed(embedPickedOperators);
+
+            return builderButton;
+        }
+
+        private static DiscordEmbed GetEmbedPickedOperators(Models.PickBans.PickBanOperators operators, string description)
+        {
             Builders.Embeds embeds = new Builders.Embeds()
                 .Init()
-                .AddDescription(
-                $"Голосование команд {Formatter.Bold(data.Team1Name)} и {Formatter.Bold(data.Team2Name)} по выбору оперативников завершено.\n" +
-                $"Бои пройдут на карте {Formatter.Bold(mapName)} на следующих оперативниках:");
+                .AddDescription(description);
 
             StringBuilder builderColumnOperators = new();
 
             foreach (KeyValuePair<Models.Teams.Team, List<Models.PickBans.PickOperatorsData>> itemTeamOperators in operators.TeamOperators)
             {
                 foreach (Models.PickBans.PickOperatorsData operatorsClass in itemTeamOperators.Value)
-                    builderColumnOperators.AppendLine(operatorsClass.OperatorName);
+                {
+                    if (string.IsNullOrEmpty(operatorsClass.OperatorName))
+                        builderColumnOperators.AppendLine(" --- ");
+                    else
+                        builderColumnOperators.AppendLine(operatorsClass.OperatorName);
+                }
 
                 embeds.AddField(Formatter.Bold(itemTeamOperators.Key.Name), builderColumnOperators.ToString(), true);
 
@@ -183,11 +199,9 @@ namespace CaliberTournamentsV2.DataHandlers.SendPickBans
 
             builderColumnOperators.Clear();
 
-            builderButton = new Builders.MessageBuilder()
-                .AddEmbed(embeds.GetEmbed());
+            DiscordEmbed embedPickedOperators = embeds.GetEmbed();
 
-            return builderButton;
+            return embedPickedOperators;
         }
-
     }
 }
