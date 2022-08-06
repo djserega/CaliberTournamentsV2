@@ -19,7 +19,7 @@
         { РекрутСнайпер, Стрелок, Сокол, Комар, Тень, Стилет, Курт, Скаут, Арчер, Вагабонд, Диабло, Султан, Бусел }
 
     public enum StatisticTypes
-        { all, operators, maps }
+        { all, operators, maps, mapsAndOperators }
     public enum StatisticDetailedTypes
         { none, picked, banned }
 }

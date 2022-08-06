@@ -5,13 +5,14 @@ namespace CaliberTournamentsV2
 {
     internal class Statistics
     {
-        internal DiscordEmbed GetStatistics(Models.StatisticTypes type, Models.StatisticDetailedTypes details)
+        internal DiscordEmbed[] GetStatistics(Models.StatisticTypes type, Models.StatisticDetailedTypes details)
         {
 #pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
-            DiscordEmbed embedMessage = type switch
+            DiscordEmbed[] embedMessage = type switch
             {
                 Models.StatisticTypes.operators => GetStatOperators(details),
                 Models.StatisticTypes.maps => GetStatMaps(details),
+                Models.StatisticTypes.mapsAndOperators => GetMapsAndOperators(details),
                 Models.StatisticTypes.all => throw new NotImplementedException()
             };
 #pragma warning restore CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
@@ -19,7 +20,7 @@ namespace CaliberTournamentsV2
             return embedMessage;
         }
 
-        private DiscordEmbed GetStatOperators(Models.StatisticDetailedTypes details)
+        private DiscordEmbed[] GetStatOperators(Models.StatisticDetailedTypes details)
         {
             List<Models.Referee.StartPickBan> listData = Models.Referee.StartPickBan.ListPickBans;
 
@@ -29,10 +30,10 @@ namespace CaliberTournamentsV2
                     .Select(el2 => el2.Operators))
                 .SelectMany(el => el.PickBanDetailed);
 
-            return GetEmbedStatistics(listDetailedOperators, details, Models.StatisticTypes.operators, el => el.Cheched);
+            return new[] { GetEmbedStatistics(listDetailedOperators, details, Models.StatisticTypes.operators, el => el.Cheched) };
         }
 
-        private DiscordEmbed GetStatMaps(Models.StatisticDetailedTypes details)
+        private DiscordEmbed[] GetStatMaps(Models.StatisticDetailedTypes details)
         {
             List<Models.Referee.StartPickBan> listData = Models.Referee.StartPickBan.ListPickBans;
 
@@ -40,13 +41,34 @@ namespace CaliberTournamentsV2
                 .Select(el => el.PickBanMap)
                 .SelectMany(el => el.PickBanDetailed);
 
-            return GetEmbedStatistics(listDetailsMaps, details, Models.StatisticTypes.maps, el => !string.IsNullOrEmpty(el.PickBanName));
+            return new[] { GetEmbedStatistics(listDetailsMaps, details, Models.StatisticTypes.maps, el => !string.IsNullOrEmpty(el.PickBanName)) };
+        }
+
+        private DiscordEmbed[] GetMapsAndOperators(Models.StatisticDetailedTypes details)
+        {
+            List<Models.Referee.StartPickBan> listData = Models.Referee.StartPickBan.ListPickBans;
+
+            IEnumerable<Models.PickBans.PickBanDetailed> listDetailsMaps = listData
+                .Select(el => el.PickBanMap)
+                .SelectMany(el => el.PickBanDetailed);
+
+            List<DiscordEmbed> embeds = new();
+
+            foreach (Models.PickBans.PickBanDetailed itemMap in listDetailsMaps)
+                embeds.Add(GetEmbedStatistics(itemMap.Operators.PickBanDetailed,
+                                              details,
+                                              Models.StatisticTypes.maps,
+                                              el => !string.IsNullOrEmpty(el.PickBanName),
+                                              $" по карте {itemMap.PickBanName}"));
+
+            return embeds.ToArray();
         }
 
         private DiscordEmbed GetEmbedStatistics(IEnumerable<Models.PickBans.PickBanDetailed> listSelectedData,
                                                 Models.StatisticDetailedTypes details,
                                                 Models.StatisticTypes type,
-                                                Func<Models.PickBans.PickBanDetailed, bool> predicateNoneType)
+                                                Func<Models.PickBans.PickBanDetailed, bool> predicateNoneType,
+                                                string postfixTitle = "")
         {
 
 #pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
@@ -74,7 +96,7 @@ namespace CaliberTournamentsV2
 
             Builders.Embeds embedsMessage = new Builders.Embeds()
                 .Init()
-                .AddTitle("Сводная информация");
+                .AddTitle("Сводная информация" + postfixTitle);
 
             StringBuilder builderResult = new();
 

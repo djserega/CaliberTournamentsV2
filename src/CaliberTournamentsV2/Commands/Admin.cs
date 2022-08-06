@@ -213,10 +213,11 @@ namespace CaliberTournamentsV2.Commands
                     StringBuilder sb = new("Доступные значения:\n");
                     sb.AppendLine("operators (picked, banned)");
                     sb.AppendLine("maps (\"\", picked, banned)");
+                    sb.AppendLine("mapsAndOperators (\"\", picked, banned)");
 
                     message = sb.ToString();
                 }
-                else if (type != "operators" && type != "maps")
+                else if (type != "operators" && type != "maps" && type != "mapsAndOperators")
                 {
                     message = "Ошибка доступных значений";
                 }
@@ -227,9 +228,16 @@ namespace CaliberTournamentsV2.Commands
                         ? Models.StatisticDetailedTypes.none
                         : (Models.StatisticDetailedTypes)Enum.Parse(typeof(Models.StatisticDetailedTypes), details);
 
-                    DiscordEmbed embedMessage = new Statistics().GetStatistics(enumType, enumDetails);
+                    DiscordEmbed[] embedMessages = new Statistics().GetStatistics(enumType, enumDetails);
 
-                    await ctx.Channel.SendMessageAsync(embedMessage);
+                    if (embedMessages.Length > 1)
+                    {
+                        Builders.MessageBuilder builder = new();
+                        foreach (DiscordEmbed item in embedMessages)
+                            builder.AddEmbed(item);
+                    }
+                    else
+                        await ctx.Channel.SendMessageAsync(embedMessages[0]);
 
                     isError = false;
                 }
